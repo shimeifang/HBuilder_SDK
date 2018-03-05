@@ -1,0 +1,165 @@
+﻿<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>我的工资</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<!--标准mui.css-->
+		<script src="../../js/common.js"></script>
+		<link rel="stylesheet" href="../../css/common.css" />
+		<link rel="stylesheet" href="../css/mui.min.css">
+		<link rel="stylesheet" type="text/css" href="CSS_ext/Cssext1.css" />
+		<!--标准mui.js-->
+		<script type="text/javascript" src="js/jquery-2.1.4.min.js"></script>
+		<script type="text/javascript" src="../js/mui.min.js"></script>
+		<script type="text/javascript" src="../fnAction/FunctionAction.js"></script>
+		<script type="text/javascript" src="../fnAction/md5-min.js"></script>
+		<style>
+			.title {
+				margin: 20px 15px 7px;
+				color: #6d6d72;
+				font-size: 15px;
+			}
+			
+			.MySalaryTableView {
+				width: 100%;
+			}
+			
+			.MySalaryTableView tr {
+				text-align: center;
+			}
+			
+			.MySalaryTableView tr td {
+				width: 30%;
+			}
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">我的工资</h1>
+		</header>
+		<div id="content" class="mui-content">
+			<ul id='MySalaryul' class="mui-table-view">
+				<li class="mui-table-view-cell">
+					<table class="MySalaryTableView">
+						<tr>
+							<td><span class="mui-h5" style="color: #03A2F5;">年&nbsp;&nbsp;&nbsp;月</span></td>
+							<td><span class="mui-h5" style="color: #03A2F5;">应发工资</span></td>
+							<td><span class="mui-h5" style="color: #03A2F5;">实发工资</span></td>
+						</tr>
+					</table>
+				</li>
+			</ul>
+		</div>
+		<script>
+		mui.plusReady(function() {
+				plus.webview.currentWebview().setStyle({
+					scrollIndicator: 'none'
+				});
+			});
+			mui.init({
+				//下拉刷新、上拉加载
+				pullRefresh: {
+					//...
+				},
+				//手势配置
+				gestureConfig: {
+					//...
+				},
+				//侧滑关闭
+				swipeBack: true, //Boolean(默认false)启用右滑关闭功能
+
+				//监听Android手机的back、menu按键
+				keyEventBind: {
+					backbutton: true, //Boolean(默认true)关闭back按键监听
+					menubutton: false //Boolean(默认true)关闭menu按键监听
+				},
+				//处理窗口关闭前的业务
+				beforeback: function() {
+					//... //窗口关闭前处理其他业务详情点击 ↑ "关闭页面"链接查看
+				},
+				preloadPages: [{
+					url: "MySalaryDetail.html",
+					id: "MySalaryDetail"
+				}]
+
+			});
+			window.addEventListener("preAct", function() {
+				var MySalaryTableobject = new Object();
+				var userInfo = $.ActionFn.GetlocalStorage("userInfo");
+				MySalaryTableobject.HRCode = userInfo.RtnLoginList[0].HRCode;
+				$.ActionFn.sendData("GetMyWage", MySalaryTableobject, CallBackSuccess)
+			})
+
+			function CallBackSuccess(returndata) {
+				if(returndata.Rtn_Code == '0') {
+					if(returndata.Content != null) {
+						//应发金额 总计
+						var YFCostTotal = 0;
+						//实发金额 总计
+						var SfCostTotal = 0;
+						var MySalaryLenth = returndata.Content.RtnMyWageList.length;
+						$("#MySalaryul").html("");
+						$("#MySalaryul").append('<li class="mui-table-view-cell"><table class="MySalaryTableView"><tr><td><span class="mui-h5" style="color: #03A2F5;">年&nbsp;&nbsp;&nbsp;月</span></td><td><span class="mui-h5" style="color: #03A2F5;">应发工资</span></td><td><span class="mui-h5" style="color: #03A2F5;">实发工资</span></td></tr>	</table></li>');
+						for(var i = 0; i < MySalaryLenth; i++) {
+							YFCostTotal += returndata.Content.RtnMyWageList[i].YFCost;
+							SfCostTotal += returndata.Content.RtnMyWageList[i].SfCost;
+							//我的工资 详情
+							$('#MySalaryul').append('<li id="MySalaryTableli" class="mui-table-view-cell"><a onclick= MySalaryTableClick(this)>' +
+								'<table class="MySalaryTableView"><tr>' +
+								'<td><span class="mui-h5">' + returndata.Content.RtnMyWageList[i].SalaryMonth + '</span></td>' +
+								'<td><span class="mui-h5">' + returndata.Content.RtnMyWageList[i].YFCost + '</span></td>' +
+								'<td><span class="mui-h5">' + returndata.Content.RtnMyWageList[i].SfCost + '</span></td></tr></table></a></li>');
+						}
+						//我的工资 总计
+						$('#MySalaryul').append('<li class="mui-table-view-cell"><table class="MySalaryTableView"><tr>' +
+							'<td><span class="mui-h5" style="color:red">总计</span></td>' +
+							'<td><span class="mui-h5" style="color:red">' + YFCostTotal + '</span></td>' +
+							'<td><span class="mui-h5" style="color:red">' + SfCostTotal + '</span></td></tr></table></li>');
+					}
+				} else if(returndata.Rtn_Code == '1') {
+					mui.toast('当前没有工资信息')
+				} else if(returndata.Rtn_Code == '-1') {
+					mui.alert(returndata.Rtn_Msg, '警告', function() {})
+				}
+			}
+			//跳转页面，将年月存到缓存
+			function MySalaryTableClick(obj) {
+				var MySalaryDetailMonth = 0;
+				$(obj).children('.MySalaryTableView').each(function() {
+					if($(this).find('td:first').find('span').html().substring(5, 6) == 0) {
+						MySalaryDetailMonth = $(this).find('td:first').find('span').html().substring(0, 5) + $(this).find('td:first').find('span').html().substring(6);
+					} else {
+						MySalaryDetailMonth = $(this).find('td:first').find('span').html();
+					}
+
+				});
+				$.ActionFn.selfFireFunction("MySalaryDetail", "preAct", MySalaryDetailMonth);
+				$.ActionFn.selfOpenWindow("MySalaryDetail", "MySalaryDetail.html");
+				//				mui.openWindow({
+				//					url: 'MySalaryDetail.html',
+				//					id: 'MySalaryDetail',
+				//					createNew: false, //是否重复创建同样id的webview，默认为false:不重复创建，直接显示
+				//					extras: {
+				//						extData: MySalaryDetailMonth,
+				//					},
+				//					waiting: {
+				//						autoShow: true, //自动显示等待框，默认为true
+				//						title: '正在加载...', //等待对话框上显示的提示内容
+				//					},
+				//					show: {
+				//						autoShow: true, //页面loaded事件发生后自动显示，默认为true
+				//						aniShow: "slide-in-right", //页面显示动画，默认为”“；
+				//						duration: 200 //页面动画持续时间，Android平台默认100毫秒，iOS平台默认200毫秒；
+				//					}
+				//				})
+			}
+		</script>
+	</body>
+
+</html>

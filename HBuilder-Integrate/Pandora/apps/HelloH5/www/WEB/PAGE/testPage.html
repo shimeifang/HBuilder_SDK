@@ -1,0 +1,93 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Insert title here</title>
+    <script type="text/javascript">
+        (function (win) {
+            var // Useragent RegExp
+            rwebkit = /(webkit)[ \/]([\w.]+)/,
+            ropera = /(opera)(?:.*version)?[ \/]([\w.]+)/,
+            rmsie = /(msie) ([\w.]+)/,
+            rmozilla = /(mozilla)(?:.*? rv:([\w.]+))?/,
+            browserMatch,
+            Browser = {},
+            userAgent = win.navigator.userAgent;
+
+            function uaMatch(ua) {
+                ua = ua.toLowerCase();
+
+                var match = rwebkit.exec(ua) ||
+                    ropera.exec(ua) ||
+                    rmsie.exec(ua) ||
+                    ua.indexOf("compatible") < 0 && rmozilla.exec(ua) ||
+                    [];
+
+                return { browser: match[1] || "", version: match[2] || "0" };
+            }
+
+            function init() {
+                browserMatch = uaMatch(userAgent);
+                if (browserMatch.browser) {
+                    Browser.userAgent = userAgent;
+                    Browser.type = browserMatch.browser;
+                    Browser[browserMatch.browser] = true;
+                    Browser.version = browserMatch.version;
+                }
+            }
+
+            init();
+
+            Browser.isChromeOrSafari = function () {
+                if (Browser.webkit) {
+                    return true;
+                }
+                return false;
+            };
+
+            Browser.isFirefox = function () {
+                if (Browser.mozilla) {
+                    return true;
+                }
+                return false;
+            };
+
+            Browser.isOpera = function () {
+                if (Browser.opera) {
+                    return true;
+                }
+                return false;
+            };
+
+            Browser.isMSIE = function () {
+                if (Browser.msie) {
+                    return true;
+                }
+                return false;
+            };
+
+            win.Browser = Browser;
+        })(window);
+        window.print = function (value) {
+            document.write(value);
+        };
+
+        window.println = function (value) {
+            print(value);
+            document.write("<br/>");
+        };
+
+        window.onload = function () {
+            println(Browser.userAgent);
+            println(Browser.type + " : " + Browser.version);
+            println("IE : " + Browser.isMSIE());
+            println("Chrome or Safari : " + Browser.isChromeOrSafari());
+            println("Firefox : " + Browser.isFirefox());
+            println("Opera : " + Browser.isOpera());
+        }
+    </script>
+</head>
+<body>
+
+</body>
+</html>    

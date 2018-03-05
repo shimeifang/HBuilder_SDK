@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<!--标准mui.css-->
+		<script src="../../js/common.js"></script>
+		<link rel="stylesheet" href="../../css/common.css" />
+		<link rel="stylesheet" href="../css/mui.min.css">
+		<link rel="stylesheet" type="text/css" href="CSS_ext/Cssext1.css" />
+		<!--标准mui.js-->
+		<script type="text/javascript" src="js/jquery-2.1.4.min.js"></script>
+		<script type="text/javascript" src="../js/mui.min.js"></script>
+		<script type="text/javascript" src="../fnAction/FunctionAction.js"></script>
+		<script type="text/javascript" src="../fnAction/md5-min.js"></script>
+		<style>
+			.MyBorrowingDetailTable {
+				width: 100%;
+                text-align:left;
+			}
+		</style>
+		<script type="text/javascript">
+			$(function() {
+				mui.plusReady(function() {
+						var self = plus.webview.currentWebview();
+						var userInfo = $.ActionFn.GetlocalStorage("userInfo");
+						var MyBorrowingobject = new Object();
+						MyBorrowingobject.DriName = userInfo.RtnLoginList[0].DriName;
+						MyBorrowingobject.Number = self.extData;
+						$.ActionFn.sendData("GetMyBorrowMoneyDetail", MyBorrowingobject, CallBackSuccess)
+					})
+					//获取保存在Session中的值
+
+			})
+
+			function CallBackSuccess(returndata) {
+				if(returndata.Rtn_Code == '0') {
+					if(returndata.Content != null) {
+						//借款单号
+						$('#MyBorrowingDetailLoanBillCode').text(returndata.Content.RtnGetMyBorrowMoneyList[0].LoanBillCode);
+						//金额
+						$('#MyBorrowingDetailMount').text(returndata.Content.RtnGetMyBorrowMoneyList[0].BorrowaMount);
+						//借款时间
+						$('#MyBorrowingDetailDate').text(returndata.Content.RtnGetMyBorrowMoneyList[0].BorrowPeriod);
+						//部门
+						$('#MyBorrowingDetailUnitName').text(returndata.Content.RtnGetMyBorrowMoneyList[0].UnitName.replace(/\d+/g, ''));
+						//所属中心
+						$('#MyBorrowingDetailUnitBranchStr').text(returndata.Content.RtnGetMyBorrowMoneyList[0].UnitBranchStr);
+						//所属板块
+						$('#MyBorrowingDetailPlate').text(returndata.Content.RtnGetMyBorrowMoneyList[0].Plate);
+						//借款事由
+						$('#MyBorrowingDetailCauses').text(returndata.Content.RtnGetMyBorrowMoneyList[0].BorrowCauses);
+						//还款时间
+						$('#MyBorrowingDetailRepaymentDate').text(returndata.Content.RtnGetMyBorrowMoneyList[0].RepaymentPeriod);
+						//备注
+						$('#MyBorrowingDetailNote').text(returndata.Content.RtnGetMyBorrowMoneyList[0].Note);
+					}
+				} else if(returndata.Rtn_Code == '1') {
+					mui.toast('当前没有借款详情')
+				} else if(returndata.Rtn_Code == '-1') {
+					mui.alert(returndata.Rtn_Msg, '警告', function() {})
+				}
+			}
+		</script>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">借款详情</h1>
+		</header>
+		<div id="content" class="mui-content">
+			<ul class="mui-table-view">
+				<li class="mui-input-row" style="padding: 11px 15px 3px 8px;border-bottom: 1px solid #c8c7cc;">
+					<table class="MySalaryDetailViewHeader">
+						<tr>
+							<td style="color: #03A2F5;">详细信息</td>
+						</tr>
+					</table>
+				</li>
+				<li class="mui-input-row" style="padding: 11px 15px 3px 8px;border-bottom: 1px solid #c8c7cc;">
+					<table class="MyBorrowingDetailTable" >
+						<tr>
+							<td style="width:64%;">
+								<span class="mui-h5" style="color: #03A1F5;font-size: 12px;">借款单号：</span>
+								<span id='MyBorrowingDetailLoanBillCode' class="mui-h5" style="color: #B7927E;font-size: 12px;"></span>
+							</td>
+							<td style="width:36%;">
+								<span class="mui-h5" style="color: #03A1F5;font-size: 12px;">金&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;额：</span>
+								<span id='MyBorrowingDetailMount' class="mui-h5" style="color: #B7927E;font-size: 12px;"></span>
+							</td>
+						</tr>
+					</table>
+				</li>
+				<li class="mui-input-row" style="padding: 11px 15px 3px 8px;border-bottom: 1px solid #c8c7cc;">
+					<table class="MyBorrowingDetailTable" >
+						<tr>
+							<td style="width:64%;">
+								<span class="mui-h5" style="color: #03A1F5;font-size: 12px;">借款时间：</span>
+								<span id='MyBorrowingDetailDate' class="mui-h5" style="color: #B7927E;font-size: 12px;"></span>
+							</td>
+							<td style="width:36%;">
+								<span class="mui-h5" style="color: #03A1F5;font-size: 12px;">部&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;门：</span>
+								<span id='MyBorrowingDetailUnitName' class="mui-h5" style="color: #B7927E;font-size: 12px;"></span>
+							</td>
+						</tr>
+					</table>
+				</li>
+				<li class="mui-input-row" style="padding: 11px 15px 3px 8px;border-bottom: 1px solid #c8c7cc;">
+					<table class="MyBorrowingDetailTable" >
+						<tr>
+							<td style="width:64%;">
+								<span class="mui-h5" style="color: #03A1F5;font-size: 12px;">所属中心：</span>
+								<span id='MyBorrowingDetailUnitBranchStr' class="mui-h5" style="color: #B7927E;font-size: 12px;"></span>
+							</td>
+							<td style="width:36%;">
+								<span class="mui-h5" style="color: #03A1F5;font-size: 12px;">所属板块：</span>
+								<span id='MyBorrowingDetailPlate' class="mui-h5" style="color: #B7927E;font-size: 12px;"></span>
+							</td>
+						</tr>
+					</table>
+				</li>
+				<li class="mui-input-row" style="padding: 11px 15px 3px 8px;border-bottom: 1px solid #c8c7cc;">
+					<table class="MyBorrowingDetailTable" >
+						<tr>
+							<td >
+								<span class="mui-h5" style="color: #03A1F5;font-size: 12px;">还款时间：</span>
+								<span id='MyBorrowingDetailRepaymentDate' class="mui-h5" style="color: #B7927E;font-size: 12px;"></span>
+							</td>
+						</tr>
+					</table>
+				</li>
+				<li class="mui-input-row" style="padding: 11px 15px 3px 8px;border-bottom: 1px solid #c8c7cc;">
+					<table class="MyBorrowingDetailTable" >
+						<tr>
+							<td>
+								<span class="mui-h5" style="color: #03A1F5;font-size: 12px;">借款事由：</span>
+								<span id='MyBorrowingDetailCauses' class="mui-h5" style="color: #B7927E;font-size: 12px;"></span>
+							</td>
+						</tr>
+					</table>
+				</li>
+				<li class="mui-input-row" style="padding: 11px 15px 3px 8px;">
+					<table class="MyBorrowingDetailTable" >
+						<tr>
+							<td>
+								<span class="mui-h5" style="color: #03A1F5;font-size: 12px;">备&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;注：</span>
+								<span id='MyBorrowingDetailNote' class="mui-h5" style="color: #B7927E;font-size: 12px;"></span>
+							</td>
+							<td></td>
+						</tr>
+					</table>
+				</li>
+			</ul>
+		</div>
+		<script>
+			mui.plusReady(function() {
+				plus.webview.currentWebview().setStyle({
+					scrollIndicator: 'none'
+				});
+			});
+			mui.init({
+				//下拉刷新、上拉加载
+				pullRefresh: {
+					//...
+				},
+				//手势配置
+				gestureConfig: {
+					//...
+				},
+				//侧滑关闭
+				swipeBack: true, //Boolean(默认false)启用右滑关闭功能
+
+				//监听Android手机的back、menu按键
+				keyEventBind: {
+					backbutton: true, //Boolean(默认true)关闭back按键监听
+					menubutton: false //Boolean(默认true)关闭menu按键监听
+				},
+				//处理窗口关闭前的业务
+				beforeback: function() {
+					//... //窗口关闭前处理其他业务详情点击 ↑ "关闭页面"链接查看
+				}
+			});
+		</script>
+	</body>
+
+</html>

@@ -1,0 +1,198 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>消息通知</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <!--标准mui.css-->
+    <link rel="stylesheet" href="../css/mui.min.css">
+    <link href="CSS_ext/Cssext1.css" rel="stylesheet" />
+    <script src="../fnAction/jquery-2.1.4.min.js"></script>
+    <script src="../fnAction/FunctionAction.js"></script>
+    <script src="../fnAction/md5-min.js"></script>
+    <script src="../../js/common.js"></script>
+    <link rel="stylesheet" href="../../css/common.css" />
+    <style>
+        .mui-card {
+            -webkit-transition: all 0.5s ease;
+            overflow: visible;
+        }
+
+        .textClass {
+            margin: 15px;
+        }
+
+        .img-del {
+            position: absolute;
+            right: -13px;
+            top: -10px;
+            display: none;
+            -webkit-transition: display 1s ease;
+        }
+        .textClass1 {
+            display:none;
+        }
+        .textClass2 {
+            transform: translate(0, 150px);
+        }
+    </style>
+</head>
+<body>
+    <header class="mui-bar mui-bar-nav" style=" background-color: #03A2F5; ">
+        <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+        <h1 style="color:white" class="mui-title">消息通知</h1>
+    </header>
+    <div id="content" class="mui-content">
+        <!--<div class="mui-card" >
+            <img src="../Images/MessageList/DelPhoto.jpg" width="26px" class="img-del" height="21px" />
+            <div class="mui-card-header">
+                <span class="mui-h4">老赵</span><br />
+                <span class="mui-h5">2016-06-30 15:30</span>
+            </div>
+            <div class="mui-card-content-inner" style="padding:5px 15px">
+                <p>今天下午会下雨，老赵赶紧回去收衣服！今天下午会下雨，老赵赶紧回去收衣服今天下午会下雨，老赵赶紧回去收衣服！</p>
+            </div>
+        </div>
+        <div class="mui-card">
+            <img src="../Images/MessageList/DelPhoto.jpg" width="26px" class="img-del" height="21px" />
+            <div class="mui-card-header ">
+                <span class="mui-h5">老赵</span><br />
+                <span class="mui-h5">2016-06-30 15:30</span>
+            </div>
+            <div class="mui-card-content-inner" style="padding:5px 15px">
+                <p>今天下午会下雨，老赵赶紧回去收衣服！今天下午会下雨，老赵赶紧回去收衣服今天下午会下雨，老赵赶紧回去收衣服！</p>
+            </div>
+        </div>-->
+    </div>
+    <script src="js/mui.min.js"></script>
+    <script>
+    mui.plusReady(function() {
+				plus.webview.currentWebview().setStyle({
+					scrollIndicator: 'none'
+				});
+			});
+        mui.init({
+            //下拉刷新、上拉加载
+            pullRefresh: {
+                //...
+            },
+            //手势配置
+            gestureConfig: {
+                longtap: true
+            },
+            //侧滑关闭
+            swipeBack: true, //Boolean(默认false)启用右滑关闭功能
+
+            //监听Android手机的back、menu按键
+            keyEventBind: {
+                backbutton: false,  //Boolean(默认true)关闭back按键监听
+                menubutton: false   //Boolean(默认true)关闭menu按键监听
+            },
+            //处理窗口关闭前的业务
+            beforeback: function () {
+                //... //窗口关闭前处理其他业务详情点击 ↑ "关闭页面"链接查看
+            }
+            
+        });
+        var userInfo = $.ActionFn.GetlocalStorage("userInfo");
+        var object =
+            {
+                ReadPerson: userInfo.RtnLoginList[0].DriName
+            }
+        var flag = 0;
+        $.ActionFn.sendData("GetRadioMsg", object, CallBackSuccess, "undefined", callBackFinish);
+        if (flag == 1)
+        {
+            //$.ActionFn.sendData("UpdateRadioMsgState", object, CallBackSuccess, "undefined", callBackFinish);
+        }
+        function CallBackSuccess(returnData) {
+            if (returnData.Rtn_Code == 0) {
+                var Msglist = $.ActionFn.GetlocalStorage("Msg" + userInfo.RtnLoginList[0].ID);
+                if (Msglist == null) {
+                    var arrayList = new Array();
+                    arrayList = returnData.Content.RtnRadioMsgList;
+                    $.ActionFn.SetlocalStorage("Msg" + userInfo.RtnLoginList[0].ID, arrayList);
+                }
+                else {
+                    Msglist = returnData.Content.RtnRadioMsgList.concat(Msglist);
+                    $.ActionFn.SetlocalStorage("Msg" + userInfo.RtnLoginList[0].ID, Msglist);
+                }
+            }
+        }
+        function callBackFinish() {
+            var Msglist = $.ActionFn.GetlocalStorage("Msg" + userInfo.RtnLoginList[0].ID);
+            var len = Msglist.length;
+            var content = document.querySelector(".mui-content");
+            for (var i = 0; i < len; i++) {
+                var cardDiv = document.createElement("div");
+                cardDiv.classList.add("mui-card");
+                var headCardDiv = document.createElement("div");
+                headCardDiv.classList.add("mui-card-header");
+                headCardDiv.innerHTML = '<span class="mui-h4">' + Msglist[i].SendPerson + '</span><br /><span class="mui-h5">' + Msglist[i].SendTime + '</span>';
+                var imgAct = document.createElement("img");
+                imgAct.src = "../Images/MessageList/DelPhoto.jpg";
+                imgAct.width = "26";
+                imgAct.height = "21";
+                imgAct.style.zIndex = '100';
+                imgAct.setAttribute("index", Msglist[i].ID);
+                imgAct.classList.add("img-del");
+                var contentCardDiv = document.createElement("div");
+                contentCardDiv.classList.add("mui-card-content-inner");
+                contentCardDiv.style.padding = "5px 15px";
+                contentCardDiv.innerHTML = '<p>' + Msglist[i].MessageNote + '</p>';
+                cardDiv.appendChild(imgAct);
+                cardDiv.appendChild(headCardDiv)
+                cardDiv.appendChild(contentCardDiv)
+                content.appendChild(cardDiv);
+            }
+            flag = 1;
+            attachListener();
+        }
+        function Del(_index)
+        {
+            var Msglist = $.ActionFn.GetlocalStorage("Msg" + userInfo.RtnLoginList[0].ID);
+            for (var i in Msglist)
+            {
+                if (Msglist[i].ID == _index)
+                {
+                    Msglist.splice(i, 1);
+                    break
+                }
+            }
+            //Msglist.splice(_index,1);
+            $.ActionFn.SetlocalStorage("Msg" + userInfo.RtnLoginList[0].ID, Msglist)
+        }
+        function attachListener()
+        {
+            var cardBlock = document.querySelectorAll(".mui-card");
+            var _len = cardBlock.length;
+            for (var j = 0; j < _len; j++) {
+                cardBlock[j].addEventListener("longtap", function (e) {
+                    e.currentTarget.classList.add("textClass");
+                    e.currentTarget.childNodes[0].style.display = "block";
+                })
+                cardBlock[j].addEventListener("tap", function (e) {
+                    e.currentTarget.classList.remove("textClass");
+                    e.currentTarget.childNodes[0].style.display = "none";
+                })
+            }
+            var imgDel = document.querySelectorAll(".img-del");
+            _len = imgDel.length;
+            for (var k = 0; k < _len; k++) {
+                imgDel[k].addEventListener("tap", function (e) {
+                    e.stopPropagation();
+                    e.currentTarget.style.display = "none";
+                    e.currentTarget.parentNode.classList.add("textClass1");
+                    var height = e.currentTarget.parentNode.offsetHeight + 15;
+                   //e.currentTarget.parentNode.nextElementSibling.style.transform = "translate(0, -" + height + "px)";
+                    //e.currentTarget.parentNode.removeNode(true)//FF不支持该属性
+                    var _index = e.currentTarget.getAttribute("index");
+                    Del(_index);
+                })
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,200 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>消息中心</title>
+    <!--标准mui.css-->
+    <link rel="stylesheet" href="css/mui.min.css">
+    <link href="CSS_ext/Cssext1.css" rel="stylesheet" />
+    <script src="../fnAction/jquery-2.1.4.min.js"></script>
+    <script src="../fnAction/FunctionAction.js"></script>
+    <script src="../../js/common.js"></script>
+    <link rel="stylesheet" href="../../css/common.css" />
+    <style>
+        .title {
+            margin: 20px 15px 10px;
+            color: #03a2f5;
+            font-size: 15px;
+        }
+        .img-after {
+            width: 20px;
+            height: 20px;
+            vertical-align: middle;
+            margin-left:10px
+        }
+        .span-img-after {
+            padding: 11px 65px 11px 15px;
+        }
+        .img-modify {
+            width:30px;
+        }
+    </style>
+</head>
+<body>
+    <header class="mui-bar mui-bar-nav">
+        <a class=" mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+        <h1 class="mui-title">消息中心</h1>
+    </header>
+    <div id = "content" class="mui-content">
+        <div class="mui-card">
+            <div class="mui-card-header"><h4>账户信息</h4></div>
+            <div class="mui-card-content">
+                    <ul class="mui-table-view">
+                        <li class="mui-table-view-cell mui-media">
+                            <a href="javascript:;">
+                                <img class="mui-pull-left" src="IMG_ext/userInfoCenter/tx.png" width="50px"style="position: relative; top: 10px;" />
+                                <div class="mui-media-body">
+                                    <ul class="mui-table-view mui-grid-view">
+                                        <li class="mui-table-view-cell mui-media mui-col-xs-6"><span class="mui-h5" id="userPhone"></span></li>
+                                        <li class="mui-table-view-cell mui-media mui-col-xs-6"><span class="mui-h5" id="userName"></span></li>
+                                        <li class="mui-table-view-cell mui-media mui-col-xs-6"><div id="toModifyPW"><span class="mui-h5">修改密码</span><img class="nui-pull-right img-after" src="IMG_ext/userInfoCenter/xgmm.png"/></div></li>
+                                        <li class="mui-table-view-cell mui-media mui-col-xs-6"><div id="exit"><span class="mui-h5">退出登录</span><img class="nui-pull-right img-after" src="IMG_ext/userInfoCenter/tcdl.png" /></div></li>
+                                    </ul>
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
+            </div>
+        </div>
+        <div class="mui-card" style="margin-bottom: 35px;">
+            <div class="mui-card-header"><h4>个人明细</h4></div>
+            <div class="mui-card-content">
+                <ul class="mui-table-view mui-table-view-chevron">
+                    <li class="mui-table-view-cell mui-media myAttendance">
+                        <a class="mui-navigate-right" >
+                            <img class="mui-media-object mui-pull-left img-modify " src="IMG_ext/userInfoCenter/mx_kq.png" style="height:30px" />
+                            <span class="mui-h4 span-img-after">我的考勤</span>
+                        </a>
+                    </li>
+                    <li class="mui-table-view-cell mui-media myAllowance">
+                        <a class='mui-navigate-right' >
+                            <img class="mui-media-object mui-pull-left img-modify " src="IMG_ext/userInfoCenter/mx_jc.png" style="height:30px" />
+                            <span class="mui-h4 span-img-after">我的补扣</span>
+                        </a>
+                    </li>
+                    <li class="mui-table-view-cell mui-media MySalaryTable">
+                        <a class="mui-navigate-right" >
+                            <img class="mui-media-object mui-pull-left img-modify" src="IMG_ext/userInfoCenter/mx_gz.png" style="height:30px" />
+                            <span class="mui-h4 span-img-after">我的工资</span>
+                        </a>
+                    </li>
+                    <li class="mui-table-view-cell mui-media MyTasks">
+                        <a class="mui-navigate-right" >
+                            <img class="mui-media-object mui-pull-left img-modify" src="IMG_ext/userInfoCenter/mx_rw.png" style="height:30px" />
+                            <span class="mui-h4 span-img-after">我的任务</span>
+                        </a>
+                    </li>
+                    <li class="mui-table-view-cell mui-media MyBorrowing">
+                        <a class="mui-navigate-right" >
+                            <img class="mui-media-object mui-pull-left img-modify" src="IMG_ext/userInfoCenter/mx_jk.png" style="height:30px" />
+                            <span class="mui-h4 span-img-after">我的借款</span>
+                        </a>
+                    </li>
+                    <li class="mui-table-view-cell mui-media MyReimbursement">
+                        <a class="mui-navigate-right" >
+                            <img class="mui-media-object mui-pull-left img-modify" src="IMG_ext/userInfoCenter/mx_bx.png" style="height:30px" />
+                            <span class="mui-h4 span-img-after">我的报销</span>
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+        </div>
+        <div class="mui-card">
+            <div class="mui-card-header"><h4>系统</h4></div>
+            <div class="mui-card-content">
+                    <ul class="mui-table-view">
+                        <li class="mui-table-view-cell mui-media technical">
+                            <a class="mui-navigate-right" >
+                                <img class="mui-media-object mui-pull-left img-modify" src="IMG_ext/userInfoCenter/tb_jszc.png" style="height:30px" />
+                                <span class="mui-h4 span-img-after">技术支持</span>
+
+                            </a>
+                        </li>
+                    </ul>
+            </div>
+        </div>
+    </div>
+    <script src="js/mui.min.js"></script>
+    <script>
+        mui.plusReady(function () {
+        	plus.webview.currentWebview().setStyle({scrollIndicator:'none'});
+        });
+        mui.init({
+            //下拉刷新、上拉加载
+            pullRefresh: {
+                //...
+            },
+            //手势配置
+            gestureConfig: {
+                //... 
+            },
+            //侧滑关闭
+            swipeBack: true, //Boolean(默认false)启用右滑关闭功能
+            //监听Android手机的back、menu按键
+            keyEventBind: {
+                backbutton: true,  //Boolean(默认true)关闭back按键监听
+                menubutton: false   //Boolean(默认true)关闭menu按键监听
+            },
+            //处理窗口关闭前的业务
+            beforeback: function () {
+                //... //窗口关闭前处理其他业务详情点击 ↑ "关闭页面"链接查看
+            },
+            preloadPages:[
+			    {
+			      url:'myAttendance.html',
+			      id:'myAttendance'
+			    },
+			    {
+			    	url:"myAllowance.html",
+			    	id:"myAllowance"
+			    },
+			    {
+			    	url:"MySalaryTable.html",
+			    	id:"MySalaryTable"
+			    }
+
+  			]
+        })
+        var userInfo = $.ActionFn.GetlocalStorage("userInfo");
+        document.querySelector("#userPhone").innerHTML = userInfo.RtnLoginList[0].DriPhone;
+        document.querySelector("#userName").innerHTML = userInfo.RtnLoginList[0].DriName;
+        document.querySelector("#toModifyPW").addEventListener("tap", function () {
+            $.ActionFn.selfOpenWindow("changePW","changePW.html");
+        })
+        document.querySelector("#exit").addEventListener("tap", function () {
+            var launchData = $.ActionFn.GetlocalStorage("launchData");
+            launchData.PassWord = "";
+            $.ActionFn.SetlocalStorage("launchData", launchData);
+            $.ActionFn.selfOpenWindow("Login","Login.html");
+        })
+        document.querySelector(".myAttendance").addEventListener("tap", function() {
+        	$.ActionFn.selfFireFunction("myAttendance","preAct","");
+			$.ActionFn.selfOpenWindow("myAttendance","myAttendance.html");
+		})
+        document.querySelector(".myAllowance").addEventListener("tap", function() {
+        	$.ActionFn.selfFireFunction("myAllowance","preAct","");
+			$.ActionFn.selfOpenWindow("myAllowance","myAllowance.html");
+		})
+        document.querySelector(".MySalaryTable").addEventListener("tap", function() {
+        	$.ActionFn.selfFireFunction("MySalaryTable","preAct","");
+			$.ActionFn.selfOpenWindow("MySalaryTable","MySalaryTable.html");
+		})
+        document.querySelector(".MyTasks").addEventListener("tap", function() {
+			$.ActionFn.selfOpenWindow("MyTasks","MyTasks.html");
+		})
+        document.querySelector(".MyBorrowing").addEventListener("tap", function() {
+			$.ActionFn.selfOpenWindow("MyBorrowing","MyBorrowing.html");
+		})
+        document.querySelector(".MyReimbursement").addEventListener("tap", function() {
+			$.ActionFn.selfOpenWindow("MyReimbursement","MyReimbursement.html");
+		})
+        document.querySelector(".technical").addEventListener("tap",function(){
+        	$.ActionFn.selfOpenWindow("technical","technical.html");
+        })
+    </script>
+</body>
+</html>

@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<title>异常上报</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<!--标准mui.css-->
+		<link rel="stylesheet" href="../css/mui.min.css">
+
+		<link href="../css/mui.picker.css" rel="stylesheet" />
+		<link href="../css/mui.poppicker.css" rel="stylesheet" />
+		<script src="js/mui.min.js"></script>
+		<script src="js/mui.picker.js"></script>
+		<script src="js/mui.poppicker.js"></script>
+		<link rel="stylesheet" type="text/css" href="CSS_ext/Cssext1.css" />
+		<!--查看大图-->
+		<script src="js/mui.zoom.js"></script>
+		<script src="js/mui.previewimage.js"></script>
+		<!--公共js-->
+		<script src="../fnAction/jquery-2.1.4.min.js"></script>
+		<script src="../fnAction/FunctionAction.js"></script>
+		<script type="text/javascript" src="../fnAction/md5-min.js"></script>
+		<style>
+			.mui-btn {
+				font-size: 16px;
+				padding: 8px;
+				margin: 3px;
+			}
+			
+			h5.mui-content-padded {
+				margin-left: 3px;
+				margin-top: 20px !important;
+			}
+			
+			h5.mui-content-padded:first-child {
+				margin-top: 12px !important;
+			}
+			
+			.ui-alert {
+				text-align: center;
+				padding: 20px 10px;
+				font-size: 16px;
+			}
+			
+			.font12 {
+				font-size: 12px;
+			}
+			/*图片放大查看*/
+			
+			.mui-preview-image.mui-fullscreen {
+				position: fixed;
+				z-index: 20;
+				background-color: #000;
+			}
+			
+			.mui-preview-header .mui-preview-indicator {
+				color: #fff;
+				text-align: center;
+				width: 100%;
+				position: absolute;
+				bottom: 11px;
+			}
+			
+			.mui-preview-image {
+				display: none;
+				-webkit-animation-duration: 0.5s;
+				animation-duration: 0.5s;
+				-webkit-animation-fill-mode: both;
+				animation-fill-mode: both;
+			}
+			
+			.mui-preview-image.mui-preview-in {
+				-webkit-animation-name: fadeIn;
+				animation-name: fadeIn;
+			}
+			
+			.mui-preview-image.mui-preview-out {
+				background: none;
+				-webkit-animation-name: fadeOut;
+				animation-name: fadeOut;
+			}
+			
+			.mui-preview-image.mui-preview-out .mui-preview-header,
+			.mui-preview-image.mui-preview-out .mui-preview-footer {
+				display: none;
+			}
+			
+			.mui-zoom-scroller {
+				position: absolute;
+				display: -webkit-box;
+				display: -webkit-flex;
+				display: flex;
+				-webkit-box-align: center;
+				-webkit-align-items: center;
+				align-items: center;
+				-webkit-box-pack: center;
+				-webkit-justify-content: center;
+				justify-content: center;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				top: 0;
+				width: 100%;
+				height: 100%;
+				margin: 0;
+				-webkit-backface-visibility: hidden;
+			}
+			
+			.mui-zoom {
+				-webkit-transform-style: preserve-3d;
+				transform-style: preserve-3d;
+			}
+			
+			.mui-slider .mui-slider-group .mui-slider-item img {
+				width: auto;
+				height: auto;
+				max-width: 100%;
+				max-height: 100%;
+			}
+			
+			.mui-android-4-1 .mui-slider .mui-slider-group .mui-slider-item img {
+				width: 100%;
+			}
+			
+			.mui-android-4-1 .mui-slider.mui-preview-image .mui-slider-group .mui-slider-item {
+				display: inline-table;
+			}
+			
+			.mui-android-4-1 .mui-slider.mui-preview-image .mui-zoom-scroller img {
+				display: table-cell;
+				vertical-align: middle;
+			}
+			
+			.mui-preview-loading {
+				position: absolute;
+				width: 100%;
+				height: 100%;
+				top: 0;
+				left: 0;
+				display: none;
+			}
+			
+			.mui-preview-loading.mui-active {
+				display: block;
+			}
+			
+			.mui-preview-loading .mui-spinner-white {
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				margin-left: -25px;
+				margin-top: -25px;
+				height: 50px;
+				width: 50px;
+			}
+			
+			.mui-preview-image img.mui-transitioning {
+				-webkit-transition: -webkit-transform 0.5s ease, opacity 0.5s ease;
+				transition: transform 0.5s ease, opacity 0.5s ease;
+			}
+			
+			@-webkit-keyframes fadeIn {
+				0% {
+					opacity: 0;
+				}
+				100% {
+					opacity: 1;
+				}
+			}
+			
+			@keyframes fadeIn {
+				0% {
+					opacity: 0;
+				}
+				100% {
+					opacity: 1;
+				}
+			}
+			
+			@-webkit-keyframes fadeOut {
+				0% {
+					opacity: 1;
+				}
+				100% {
+					opacity: 0;
+				}
+			}
+			
+			@keyframes fadeOut {
+				0% {
+					opacity: 1;
+				}
+				100% {
+					opacity: 0;
+				}
+			}
+		</style>
+		<script type="text/javascript">
+			$(function() {
+					//上报异常
+					$('#AbnormalbtnSave').click(function() {
+						var userInfo = $.ActionFn.GetlocalStorage("userInfo");
+						var AbnormalManageObject = new Object();
+						//运单编号
+						AbnormalManageObject.ShipperCode = 'SZ2016060300024';
+						//上报人
+						AbnormalManageObject.AbnorPerson = userInfo.RtnLoginList[0].DriName;
+						//异常类型
+						if($('#showAbnormalTypeSpan').text() == '') {
+							mui.alert('请选择异常类型', '警告', function() {})
+							return;
+						} else if($('#showAbnormalKindSpan').text() == '') {
+							mui.alert('请选择异常种类', '警告', function() {})
+							return;
+						} else {
+							AbnormalManageObject.AbnorType = $('#showAbnormalKindSpan').text();
+						}
+						//异常备注
+						AbnormalManageObject.AbnorNote = $('#AbnormalRemarks').val();
+						//异常照片1
+						AbnormalManageObject.AbnorPhoto11 = $('#AbnorPhoto1').attr('src').substring(22);
+						//异常照片2
+						AbnormalManageObject.AbnorPhoto22 = $('#AbnorPhoto2').attr('src').substring(22);
+						//异常照片3
+						AbnormalManageObject.AbnorPhoto33 = $('#AbnorPhoto3').attr('src').substring(22);
+						$.ActionFn.sendData("ReportAbnormal", AbnormalManageObject, CallBackSuccess, callBackFinish);
+					})
+
+					function CallBackSuccess(returndata) {
+						if(returndata.Rtn_Code == '0') {
+							mui.toast(returndata.Rtn_Msg)
+						}
+					}
+
+					function callBackFinish() {}
+				})
+				//图片新增方法
+			function AddAbnorPhoto(obj) {
+				if(obj.id == 'AbnorPhoto1' && $('#AbnorPhoto1').attr('src') == '../PAGE/IMG_ext/AbnormalManage/APPPhoto.png') {
+					//navigator.camera.getPicture(AbnorPhoto1Photo, onFail, { quality: 75, destinationType: navigator.camera.DestinationType.DATA_URL, targetWidth: 300, targetHeight: 300,sourceType: navigator.camera.PictureSourceType.PHOTOLIBRARY  });
+				} else if(obj.id == 'AbnorPhoto2' && $('#AbnorPhoto2').attr('src') == '../PAGE/IMG_ext/AbnormalManage/APPPhoto.png') {
+					//navigator.camera.getPicture(AbnorPhoto2Photo, onFail, { quality: 75, destinationType: navigator.camera.DestinationType.DATA_URL, targetWidth: 300, targetHeight: 300,sourceType: navigator.camera.PictureSourceType.PHOTOLIBRARY  });       		
+				} else if(obj.id == 'AbnorPhoto3' && $('#AbnorPhoto3').attr('src') == '../PAGE/IMG_ext/AbnormalManage/APPPhoto.png') {
+					//navigator.camera.getPicture(AbnorPhoto3Photo, onFail, { quality: 75, destinationType: navigator.camera.DestinationType.DATA_URL, targetWidth: 300, targetHeight: 300,sourceType: navigator.camera.PictureSourceType.PHOTOLIBRARY  });
+				}
+				//找到父元素 的下一个兄弟元素
+				var a = $(obj).parent('div').next().html();
+				//找到上一个兄弟元素  prev()
+				$('#' + $(obj).prev().attr('id')).show();
+				$('#' + $(a).attr('value')).attr('src', '../PAGE/IMG_ext/AbnormalManage/APPPhoto.png').show();
+			}
+
+			function AbnorPhoto1Photo(imageData) {
+				if($('#AbnorPhoto1').attr('src') == '../PAGE/IMG_ext/AbnormalManage/APPPhoto.png') {
+					$('#AbnorPhoto1').attr('src', "data:image/jpeg;base64," + imageData).attr('data-preview-src', '').attr('data-preview-group', '1').css('height', '').css('width', '100%').css('margin-top', '5px');
+				}
+			}
+
+			function AbnorPhoto2Photo(imageData) {
+				if($('#AbnorPhoto2').attr('src') == '../PAGE/IMG_ext/AbnormalManage/APPPhoto.png') {
+					$('#AbnorPhoto2').attr('src', "data:image/jpeg;base64," + imageData).attr('data-preview-src', '').attr('data-preview-group', '1').css('height', '').css('width', '100%').css('margin-top', '5px');
+				}
+			}
+
+			function AbnorPhoto3Photo(imageData) {
+				if($('#AbnorPhoto3').attr('src') == '../PAGE/IMG_ext/AbnormalManage/APPPhoto.png') {
+					$('#AbnorPhoto3').attr('src', "data:image/jpeg;base64," + imageData).attr('data-preview-src', '').attr('data-preview-group', '1').css('height', '').css('width', '100%').css('margin-top', '5px');
+				}
+			}
+			//图片删除方法
+			function AbnorPhotoDel(obj) {
+				//如果删除的图片为第三张
+				if($(obj).attr('value') == 'AbnorPhoto3') {
+					//将第三张图片改为原图
+					$('#' + $(obj).attr('value')).attr('src', '../PAGE/IMG_ext/AbnormalManage/APPPhoto.png').css('margin-top', '5px').css('height', '60px').css('width', '60px').removeAttr('data-preview-src').removeAttr('data-preview-group');
+					//隐藏第三张图的删除按钮
+					$('#' + obj.id).hide();
+				}
+				//如果删除的图片为第二张
+				else if($(obj).attr('value') == 'AbnorPhoto2') {
+					//取到第三张图片的html
+					var a = $(obj).parent('div').next().html();
+					//判断第三张图片是否存在 如果存在 
+					if($('#' + $(a).attr('value')).attr('src') != '../PAGE/IMG_ext/AbnormalManage/APPPhoto.png') {
+						//将第三张图片赋给删除的第二张
+						$('#' + $(obj).attr('value')).attr('src', $('#' + $(a).attr('value')).attr('src'));
+						//将第三张图片删除
+						$('#' + $(a).attr('value')).attr('src', '../PAGE/IMG_ext/AbnormalManage/APPPhoto.png').css('margin-top', '5px').css('height', '60px').css('width', '60px').removeAttr('data-preview-src').removeAttr('data-preview-group');
+						//隐藏第三张图片的删除按钮
+						$('#' + $(a).attr('id')).hide();
+					}
+					//如果不存在  隐藏
+					else {
+						//将第二张图片改为原图
+						$('#' + $(obj).attr('value')).attr('src', '../PAGE/IMG_ext/AbnormalManage/APPPhoto.png').css('margin-top', '5px').css('height', '60px').css('width', '60px').removeAttr('data-preview-src').removeAttr('data-preview-group');
+						//隐藏第三张图片
+						$('#' + $(a).attr('value')).hide();
+						//将删除按钮隐藏
+						$('#' + obj.id).hide();
+					}
+				}
+				//如果删除的图片为第一张
+				else if($(obj).attr('value') == 'AbnorPhoto1') {
+					//取到第二张图片的html
+					var a = $(obj).parent('div').next().html();
+					//取出第三张图片的html
+					var b = $(obj).parent('div').next().next().html();
+					//判断第二张图片是否存在 如果存在
+					if($('#' + $(a).attr('value')).attr('src') != '../PAGE/IMG_ext/AbnormalManage/APPPhoto.png') {
+						//判断第三张图片是否存在 如果存在
+						if($('#' + $(b).attr('value')).attr('src') != '../PAGE/IMG_ext/AbnormalManage/APPPhoto.png') {
+							//将第二张图片赋给删除的第一张
+							$('#' + $(obj).attr('value')).attr('src', $('#' + $(a).attr('value')).attr('src'));
+							//将第三张图片赋给第二张
+							$('#' + $(a).attr('value')).attr('src', $('#' + $(b).attr('value')).attr('src'));
+							//将第三张图片删除
+							$('#' + $(b).attr('value')).attr('src', '../PAGE/IMG_ext/AbnormalManage/APPPhoto.png').css('margin-top', '5px').css('height', '60px').css('width', '60px').removeAttr('data-preview-src').removeAttr('data-preview-group');
+							//隐藏第三张图片的删除按钮
+							$('#' + $(b).attr('id')).hide();
+						} else {
+							//将第二张图片赋给删除的第一张
+							$('#' + $(obj).attr('value')).attr('src', $('#' + $(a).attr('value')).attr('src'));
+							//将第二张图片删除
+							$('#' + $(a).attr('value')).attr('src', '../PAGE/IMG_ext/AbnormalManage/APPPhoto.png').css('margin-top', '5px').css('height', '60px').css('width', '60px').removeAttr('data-preview-src').removeAttr('data-preview-group');
+							//隐藏第二张图片的删除按钮
+							$('#' + $(a).attr('id')).hide();
+							//将第三张图隐藏
+							$('#' + $(b).attr('value')).hide();
+						}
+					} else {
+						//将第一张图片删除
+						$('#' + $(obj).attr('value')).attr('src', '../PAGE/IMG_ext/AbnormalManage/APPPhoto.png').css('margin-top', '5px').css('height', '60px').css('width', '60px').removeAttr('data-preview-src').removeAttr('data-preview-group');
+						//隐藏第一张图片的删除按钮
+						$('#' + $(obj).attr('id')).hide();
+						//将第二张图隐藏
+						$('#' + $(a).attr('value')).hide();
+					}
+				}
+			}
+
+			function getBase64Image(_b) {
+				//				var img = document.createElement('img');
+				//				img.src = p;
+				console.log("start");
+				var canvas = document.createElement("canvas");
+				canvas.width = _b.width;
+				canvas.height = _b.height;
+				var ctx = canvas.getContext("2d");
+				ctx.drawImage(_b, 0, 0);
+				var dataURL = canvas.toDataURL("image/png");
+				console.log(dataURL);
+				return dataURL;
+
+				// return dataURL.replace("data:image/png;base64,", "");
+			}
+
+			function getImage(sender) {
+				var cmr = plus.camera.getCamera(); //拍照对象
+				cmr.captureImage(function(p) { //开启摄像头
+					plus.io.resolveLocalFileSystemURL(p, function(entry) { //isFile
+						if(entry.isFile) {
+							var urlx = entry.toRemoteURL()
+							$('#AbnorPhoto1').attr('src', urlx);
+							//getBase64Image($('#AbnorPhoto1')[0]);
+							var c = document.getElementById("myCanvas");
+							var ctx = c.getContext("2d");
+							var img = document.getElementById("AbnorPhoto1");
+							ctx.drawImage(img, 10, 10);
+							console.log(c.toDataURL());
+						}
+					}, function(e) {});
+
+				}, function(e) {
+					mui.toast("失败：" + e.message);
+				}, {
+					filename: "_doc/camera/", //图片路径参数
+					index: 1,
+					format: "png"
+				});
+
+			}
+		</script>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav" style=" background-color: #03A2F5; ">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 style="color:white" class="mui-title">异常上报</h1>
+		</header>
+		<div class="mui-content">
+			<div class="mui-content-padded">
+				<div style="margin-top:10px;">
+					<button id='showAbnormalType' class="mui-btn mui-btn-block" type='button'>
+            		<span style="float: left; color: #58C4FC; ">选择异常类型</span>
+            		<span style="float: right; color: #58C4FC; ">请选择(必选)</span>
+            	</button>
+				</div>
+				<div style="margin-top:10px;">
+					<button id='showAbnormalKind' class="mui-btn mui-btn-block" type='button'>
+            		<span style="float: left; color: #58C4FC; ">选择异常种类</span>
+            		<span style="float: right; color: #58C4FC; ">请选择(必选)</span>
+            	</button>
+				</div>
+				<div style="background-color:white; margin-top:10px;">
+					<div style="width:100%;line-height:38px;">
+						<label style="color: #58C4FC; float:left; margin-left:10px; ">备注</label>
+					</div>
+					<div align="center" class="mui-input-row">
+						<textarea rows="5" id='AbnormalRemarks' style="width: 95%;"></textarea>
+					</div>
+				</div>
+				<div style=" background-color:white; margin-top:10px;">
+					<div style="width:100%;line-height: 38px;">
+						<label style="color: #58C4FC; float:left; margin-left:10px; ">附件(异常照片)</label>
+					</div>
+					<div align="center" class="mui-input-row">
+						<div style="width: 95%;">
+							<div style="width: 30%;float: left;margin: 0 5px 0 5px;">
+								<canvas id="myCanvas" width="100" height="100" style="border:1px solid #d3d3d3;background:#ffffff;"></canvas>
+								<img id='AbnorPhotoDel1' onclick="AbnorPhotoDel(this)" hidden value='AbnorPhoto1' src="../PAGE/IMG_ext/AbnormalManage/DelPhoto.jpg" style="float: right; position: relative; left: 9px; top: 15px; ">
+								<img style="width: 100%;margin-top: 34px;height: 60px;width: 60px;" id='AbnorPhoto1' onclick="getImage(this)" src="../PAGE/IMG_ext/AbnormalManage/APPPhoto.png" />
+							</div>
+							<div style="width: 30%;float: left;margin: 0 5px 0 5px;">
+								<img id='AbnorPhotoDel2' onclick="AbnorPhotoDel(this)" hidden value='AbnorPhoto2' src="../PAGE/IMG_ext/AbnormalManage/DelPhoto.jpg" style="float: right; position: relative; left: 9px; top: 15px; ">
+								<img style="width: 100%;margin-left: 1%;margin-top: 34px;height: 60px;width: 60px;" onclick="AddAbnorPhoto(this)" id='AbnorPhoto2' hidden src="" />
+							</div>
+							<div style="width: 29%;float: left;margin: 0 5px 0 5px;">
+								<img id='AbnorPhotoDel3' onclick="AbnorPhotoDel(this)" hidden value='AbnorPhoto3' src="../PAGE/IMG_ext/AbnormalManage/DelPhoto.jpg" style="float: right; position: relative; left: 9px; top: 15px; ">
+								<img style="width: 100%;float: right;margin-top: 34px;height: 60px;width: 60px;" onclick="AddAbnorPhoto(this)" id='AbnorPhoto3' hidden src="" />
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div style="width: 100%; text-align: center;">
+			<button style="width: 80%;" type="button" class="mui-btn mui-btn-primary" id="AbnormalbtnSave">保存</button>
+			<input type="hidden" value="" id="hid_data" />
+		</div>
+	</body>
+	<script type="text/javascript">
+		mui.init({
+				//下拉刷新、上拉加载
+				pullRefresh: {
+					//...
+				},
+				//手势配置
+				gestureConfig: {
+					//...
+				},
+				//侧滑关闭
+				swipeBack: true, //Boolean(默认false)启用右滑关闭功能
+
+				//监听Android手机的back、menu按键
+				keyEventBind: {
+					backbutton: true, //Boolean(默认true)关闭back按键监听
+					menubutton: false //Boolean(默认true)关闭menu按键监听
+				},
+				//处理窗口关闭前的业务
+				beforeback: function() {
+					//... //窗口关闭前处理其他业务详情点击 ↑ "关闭页面"链接查看
+				}
+			})
+			//图片支持放大查看
+		mui.previewImage();
+		//      window.addEventListener("preAct",function(){
+		//      	
+		//      })
+		(function($, doc) {
+			$.ready(function() {
+				//异常类型选择
+				var showAbnormalTypePicker = new $.PopPicker();
+				showAbnormalTypePicker.setData([{
+					value: '1',
+					text: '晚点异常'
+				}, {
+					value: '2',
+					text: '事故异常'
+				}, {
+					value: '3',
+					text: '货物异常'
+				}, {
+					value: '4',
+					text: '其他异常'
+				}]);
+
+				//异常类型下拉框
+				var showAbnormalTypeButton = doc.getElementById('showAbnormalType');
+				showAbnormalTypeButton.addEventListener('tap', function(event) {
+					showAbnormalTypePicker.show(function(items) {
+						showAbnormalTypeButton.innerHTML = '<span id="showAbnormalTypeSpan" style="float: left; color: #58C4FC; ">' + items[0].text + '</span>';
+						showAbnormalTypeChange(items[0].text);
+					});
+				}, false);
+				//异常种类下拉框
+				var showAbnormalKindButton = doc.getElementById('showAbnormalKind');
+				showAbnormalKindButton.addEventListener('tap', function(event) {
+					showAbnormalKindPickerObj.show(function(items) {
+						showAbnormalKindButton.innerHTML = '<span id="showAbnormalKindSpan" style="float: left; color: #58C4FC; ">' + items[0].text + '</span>';
+					});
+				}, false);
+			});
+			var showAbnormalKindPickerObj = new $.PopPicker();
+
+			function showAbnormalTypeChange(obj) {
+				switch(obj) {
+					case '晚点异常':
+						showAbnormalKindPickerObj.setData([{
+							value: '01',
+							text: '天气'
+						}, {
+							value: '02',
+							text: '路况'
+						}, {
+							value: '03',
+							text: '堵车'
+						}]);
+						break;
+					case '事故异常':
+						showAbnormalKindPickerObj.setData([{
+							value: '01',
+							text: '重大'
+						}, {
+							value: '02',
+							text: '超大'
+						}, {
+							value: '03',
+							text: '一般'
+						}]);
+						break;
+					case '货物异常':
+						showAbnormalKindPickerObj.setData([{
+							value: '01',
+							text: '破损'
+						}, {
+							value: '02',
+							text: '丢失'
+						}, {
+							value: '03',
+							text: '串货'
+						}]);
+						break;
+					case '其他异常':
+						showAbnormalKindPickerObj.setData([{
+							value: '01',
+							text: '拒收'
+						}, {
+							value: '02',
+							text: '加油'
+						}]);
+						break;
+				}
+			}
+		})(mui, document);
+	</script>
+
+</html>

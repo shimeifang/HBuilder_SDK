@@ -1,0 +1,158 @@
+﻿<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>我的补扣</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<!--标准mui.css-->
+		<script src="../../js/common.js"></script>
+    	<link rel="stylesheet" href="../../css/common.css" />
+		<link rel="stylesheet" href="../css/mui.min.css">
+		<link rel="stylesheet" type="text/css" href="CSS_ext/Cssext1.css" />
+		<script src="../fnAction/jquery-2.1.4.min.js"></script>
+		<script src="../fnAction/FunctionAction.js"></script>
+		<script src="../fnAction/md5-min.js"></script>
+		
+		<style>
+			.title {
+				margin: 20px 15px 7px;
+				color: #03a2f5;
+				font-size: 15px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">我的补扣</h1>
+		</header>
+		<div id ="content" class="mui-content">
+			<ul class="mui-table-view">
+				<li class="mui-table-view-cell ">
+					<div class="mui-grid-view mui-row">
+						<div class="mui-col-xs-4"><span class="mui-h5">年月</span></div>
+						<div class="mui-col-xs-4"><span class="mui-h5">补贴金额</span></div>
+						<div class="mui-col-xs-4"><span class="mui-h5">扣款金额</span></div>
+					</div>
+				</li>
+			</ul>
+			<ul class="mui-table-view" id="contentAllowance">
+				<!--<li class="mui-table-view-cell ">
+                <input type="hidden" value="1" />
+                <div class="mui-grid-view mui-row">
+                    <div class="mui-col-xs-4"><span class="mui-h5">11</span></div>
+                    <div class="mui-col-xs-4"><span class="mui-h5">11</span></div>
+                    <div class="mui-col-xs-4"><span class="mui-h5">11</span></div>
+                </div>
+            </li>-->
+			</ul>
+			<!--<ul class="mui-table-view ">
+            <li class="mui-table-view-cell ">
+                <div class="mui-grid-view mui-row">
+                    <div class="mui-col-xs-4"><span class="mui-h5 ui-sum-span">总计</span></div>
+                    <div class="mui-col-xs-4"><span class="mui-h5 ui-sum-span" id="sumIncentiveType0"></span></div>
+                    <div class="mui-col-xs-4"><span class="mui-h5 ui-sum-span" id="sumIncentiveType1"></span></div>
+                </div>
+            </li>
+        </ul>-->
+
+		</div>
+		<script type="text/javascript" src="../js/mui.min.js"></script>
+		<script>
+			mui.plusReady(function() {
+				plus.webview.currentWebview().setStyle({scrollIndicator:'none'});
+			});
+			mui.init({
+					//下拉刷新、上拉加载
+					pullRefresh: {
+						//...
+					},
+					//手势配置
+					gestureConfig: {
+						//...
+					},
+					//侧滑关闭
+					swipeBack: true, //Boolean(默认false)启用右滑关闭功能
+
+					//监听Android手机的back、menu按键
+					keyEventBind: {
+						backbutton: true, //Boolean(默认true)关闭back按键监听
+						menubutton: false //Boolean(默认true)关闭menu按键监听
+					},
+					//处理窗口关闭前的业务
+					beforeback: function() {
+						//... //窗口关闭前处理其他业务详情点击 ↑ "关闭页面"链接查看
+					}
+				})
+				//读取接口
+				window.addEventListener("preAct",function(){
+					var objectData = new Object();
+					var userInfo = $.ActionFn.GetlocalStorage("userInfo");
+					objectData.DriID = userInfo.RtnLoginList[0].DriID;
+					$.ActionFn.sendData("GetRewardsPunishments", objectData, successCallBac);
+					function successCallBac(returnData) {
+						if(returnData.Rtn_Code == "0") {
+							var sumIncentiveType0 = 0;
+							var sumIncentiveType1 = 0;
+							var dataBase = returnData.Content.RtnRewardsPunishmentsList;
+							var ulDom = document.querySelector("#contentAllowance");
+							var n = dataBase.length;
+							for(var i = 0; i < n; i++) {
+								var liNodes = document.createElement('li');
+								liNodes.classList.add("mui-table-view-cell");
+								var inputLiNode = document.createElement('input');
+								inputLiNode.type = "hidden";
+								inputLiNode.value = dataBase[i].Datadate.substring(0, 7).trim();
+								liNodes.appendChild(inputLiNode);
+								var divLiNode = document.createElement('div');
+								divLiNode.classList.add("mui-grid-view");
+								divLiNode.classList.add("mui-row");
+								var htmlStr = '<div class="mui-col-xs-4"><span class="mui-h5">' + dataBase[i].Datadate.substring(0, 7).trim() + '</span></div><div class="mui-col-xs-4"><span class="mui-h5">' + dataBase[i].IncentiveType0 + '</span></div><div class="mui-col-xs-4"><span class="mui-h5">' + dataBase[i].IncentiveType1 + '</span></div>';
+								divLiNode.innerHTML = htmlStr;
+								liNodes.appendChild(divLiNode);
+								sumIncentiveType0 += parseInt(dataBase[i].IncentiveType0);
+								sumIncentiveType1 += parseInt(dataBase[i].IncentiveType1)
+								ulDom.appendChild(liNodes);
+							}
+							var sumLi = document.createElement("li");
+							sumLi.classList.add("mui-table-view-cell");
+							sumLi.innerHTML = '<div class="mui-grid-view mui-row"><div class="mui-col-xs-4"><span class="mui-h5 ui-sum-span">总计</span></div><div class="mui-col-xs-4"><span class="mui-h5 ui-sum-span">' + sumIncentiveType0.toFixed(2) + '</span></div><div class="mui-col-xs-4"><span class="mui-h5 ui-sum-span">' + sumIncentiveType1.toFixed(2) + '</span></div></div>';
+							ulDom.appendChild(sumLi);
+		
+						} else if(returnData.Rtn_Code == "1") {
+							mui.toast('当前没有补扣信息');
+						} else if(returnData.Rtn_Code == "-1") {
+							mui.alert(returnData.Rtn_Msg, '警告', function() {});
+						}
+					}
+				})
+			mui("#contentAllowance").on("tap", "li", function() {
+				var val = document.querySelector(".mui-active>input").value;
+				$.ActionFn.selfFireFunction("myAllowanceDetail","preAct","")
+				$.ActionFn.selfOpenWindow("myAllowanceDetail","myAllowanceDetail.html");
+				mui.openWindow({
+					url: 'myAllowanceDetail.html',
+					id: 'myAllowanceDetail',
+					createNew: false, //是否重复创建同样id的webview，默认为false:不重复创建，直接显示
+					extras: {
+						extData: val,
+					},
+					waiting: {
+						autoShow: true, //自动显示等待框，默认为true
+						title: '正在加载...', //等待对话框上显示的提示内容
+					},
+					show: {
+						autoShow: true, //页面loaded事件发生后自动显示，默认为true
+						aniShow: "slide-in-right", //页面显示动画，默认为”“；
+						duration: 200 //页面动画持续时间，Android平台默认100毫秒，iOS平台默认200毫秒；
+					}
+				})
+			})
+		</script>
+	</body>
+
+</html>

@@ -1,0 +1,39 @@
+﻿/*个人信息列表合计红色*/
+.ui-sum-span {
+    color: red;
+}
+/*个人信息列表表头蓝色*/
+.ui-title-span {
+    color: #00a8ff;
+}
+
+.mui-bar > a, .mui-bar > h1 {
+    color: #ffffff;
+}
+
+.mui-bar {
+    background-color: #03a2f5;
+}
+
+.mui-table-view-cell:after {
+    left: 0px;
+}
+
+.mui-row > [class*='mui-col-'] {
+    text-align: center;
+}
+.table-title  span {
+    color:#03a2f5;
+}
+.search-span {
+    color:#03a2f5;
+}
+.search-Tool {
+    padding-top:10px;
+}
+.mui-content>.mui-table-view:first-child{
+	margin-top:0px ;
+}
+.form:first-child{
+	margin-top:0px;
+}

@@ -1,0 +1,112 @@
+﻿<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>补扣明细</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<!--标准mui.css-->
+		<script src="../../js/common.js"></script>
+    	<link rel="stylesheet" href="../../css/common.css" />
+		<link rel="stylesheet" href="../css/mui.min.css">
+		<link rel="stylesheet" type="text/css" href="CSS_ext/Cssext1.css" />
+		<script src="../fnAction/jquery-2.1.4.min.js"></script>
+		<script src="../fnAction/FunctionAction.js"></script>
+		<script src="../fnAction/md5-min.js"></script>
+
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">补扣明细</h1>
+		</header>
+		<div id="content" class="mui-content">
+			<ul class="mui-table-view">
+				<li class="mui-table-view-cell ">
+					<div class="mui-grid-view mui-row table-title">
+						<div class="mui-col-xs-3"><span class="mui-h5">补扣项目</span></div>
+						<div class="mui-col-xs-3"><span class="mui-h5">金额</span></div>
+						<div class="mui-col-xs-3"><span class="mui-h5">兑现方式</span></div>
+						<div class="mui-col-xs-3"><span class="mui-h5">时间</span></div>
+					</div>
+				</li>
+			</ul>
+			<ul class="mui-table-view" id="contentAllowanceDetail">
+				<!--<li class="mui-table-view-cell ">
+                <div class="mui-grid-view mui-row">
+                    <div class="mui-col-xs-3"><span class="mui-h5">其他补贴</span></div>
+                    <div class="mui-col-xs-3"><span class="mui-h5">100.00</span></div>
+                    <div class="mui-col-xs-3"><span class="mui-h5">工资兑现</span></div>
+                    <div class="mui-col-xs-3"><span class="mui-h6">2012-02-04</span></div>
+                </div>
+            </li>-->
+			</ul>
+		</div>
+		<script type="text/javascript" src="../js/mui.min.js"></script>
+		<script>
+			mui.plusReady(function() {
+				plus.webview.currentWebview().setStyle({
+					scrollIndicator: 'none'
+				});
+			});
+			window.addEventListener("preAct", function() {
+				var extdata = event.detail.extdata;
+				var objectData = new Object();
+				objectData.AttendanceMonth = extdata;
+				objectData.DirID = $.ActionFn.getPagesData("userInfo").RtnLoginList[0].DriID;
+				$.ActionFn.sendData("GetRewardsPunishmentsDetail", objectData, successCallBac)
+
+				function successCallBac(returnData) {
+					if(returnData.Rtn_Code == "0") {
+						var dataBase = returnData.Content.RtnRewardsPunishmentsDetailList;
+						var n = dataBase.length;
+						var uldom = document.querySelector("#contentAllowanceDetail");
+						uldom.innerHTML = "";
+						for(var i = 0; i < n; i++) {
+							var liNodes = document.createElement('li');
+							liNodes.classList.add("mui-table-view-cell");
+							var divLiNode = document.createElement('div');
+							divLiNode.classList.add("mui-grid-view");
+							divLiNode.classList.add("mui-row");
+							var htmlStr = '<div class="mui-col-xs-3"><span class="mui-h5">' + dataBase[i].ITEMNAME + '</span></div><div class="mui-col-xs-3"><span class="mui-h6">' + dataBase[i].IncentiveAmount.toFixed(2) + '</span></div><div class="mui-col-xs-3"><span class="mui-h6">' + dataBase[i].ITEMNAME1 + '</span></div><div class="mui-col-xs-3"><span class="mui-h6">' + dataBase[i].DataDate.substring(0, 11).trim() + '</span></div>';
+							divLiNode.innerHTML = htmlStr;
+							liNodes.appendChild(divLiNode);
+							uldom.appendChild(liNodes);
+						}
+					} else if(returnData.Rtn_Code == "1") {
+						mui.toast('没有详情信息。');
+					} else if(returnData.Rtn_Code == "-1") {
+						mui.alert(returnData.Rtn_Msg, '警告', function() {});
+					}
+				}
+			})
+			mui.init({
+				//下拉刷新、上拉加载
+				pullRefresh: {
+					//...
+				},
+				//手势配置
+				gestureConfig: {
+					//...
+				},
+				//侧滑关闭
+				swipeBack: true, //Boolean(默认false)启用右滑关闭功能
+
+				//监听Android手机的back、menu按键
+				keyEventBind: {
+					backbutton: true, //Boolean(默认true)关闭back按键监听
+					menubutton: false //Boolean(默认true)关闭menu按键监听
+				},
+				//处理窗口关闭前的业务
+				beforeback: function() {
+					//... //窗口关闭前处理其他业务详情点击 ↑ "关闭页面"链接查看
+					$.ActionFn.selfFireFunction("myAllowance", "preAct", "");
+				}
+			})
+		</script>
+	</body>
+
+</html>

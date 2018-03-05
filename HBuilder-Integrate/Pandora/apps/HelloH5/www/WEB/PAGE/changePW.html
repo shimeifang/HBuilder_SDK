@@ -1,0 +1,102 @@
+﻿<!DOCTYPE html>
+<html class="ui-page-login">
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title></title>
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<link href="CSS_ext/Cssext1.css" rel="stylesheet" />
+		<script src="../../js/common.js"></script>
+		<link rel="stylesheet" href="../../css/common.css" />
+		<script src="../fnAction/jquery-2.1.4.min.js"></script>
+		<script src="../fnAction/FunctionAction.js"></script>
+		<script src="../fnAction/md5-min.js"></script>
+		<style>
+			.mui-input-group label {
+				/*width: 115px;*/
+				width: 37%;
+				/*width: 22%;*/
+			}
+			
+			.mui-input-row label~ input,
+			.mui-input-row label~ select,
+			.mui-input-row label~ textarea {
+				/*width: 200px;*/
+				width: 63%;
+				/*width: 78%;*/
+			}
+			
+			.mui-checkbox input[type=checkbox],
+			.mui-radio input[type=radio] {
+				top: 20px;
+			}
+			
+			.mui-content-padded {
+				margin-top: 25px;
+			}
+			
+			.mui-btn {
+				padding: 6px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">修改密码</h1>
+		</header>
+		<div id="content" class="mui-content">
+			<form class="mui-input-group">
+				<div class="mui-input-row">
+					<label>原密码：</label>
+					<input id='account' type="password" class="mui-input-clear mui-input" placeholder="请输入原密码">
+				</div>
+				<div class="mui-input-row">
+					<label>新密码：</label>
+					<input id='password' type="password" class="mui-input-clear mui-input" placeholder="请输入新密码">
+				</div>
+				<div class="mui-input-row">
+					<label>确认密码：</label>
+					<input id='password_confirm' type="password" class="mui-input-clear mui-input" placeholder="再次输入密码">
+				</div>
+			</form>
+			<div class="mui-content-padded">
+				<button id='reg' class="mui-btn mui-btn-block mui-btn-primary">确认修改</button>
+			</div>
+		</div>
+		<script src="js/mui.min.js"></script>
+		<script src="JS_ext/changePassword.js"></script>
+		<script>
+			mui.plusReady(function() {
+				plus.webview.currentWebview().setStyle({
+					scrollIndicator: 'none'
+				});
+			});
+			mui.init({
+				//下拉刷新、上拉加载
+				pullRefresh: {
+					//...
+				},
+				//手势配置
+				gestureConfig: {
+					//...
+				},
+				//侧滑关闭
+				swipeBack: true, //Boolean(默认false)启用右滑关闭功能
+
+				//监听Android手机的back、menu按键
+				keyEventBind: {
+					backbutton: true, //Boolean(默认true)关闭back按键监听
+					menubutton: false //Boolean(默认true)关闭menu按键监听
+				},
+				//处理窗口关闭前的业务
+				beforeback: function() {
+					//... //窗口关闭前处理其他业务详情点击 ↑ "关闭页面"链接查看
+				}
+			})
+		</script>
+	</body>
+
+</html>

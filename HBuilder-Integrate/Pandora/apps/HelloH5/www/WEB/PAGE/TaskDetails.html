@@ -1,0 +1,489 @@
+﻿<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<title>任务详情</title>
+		<!--标准mui.css-->
+		<link rel="stylesheet" href="css/mui.min.css">
+		<script src="js/mui.min.js"></script>
+		<script src="../fnAction/jquery-2.1.4.min.js"></script>
+		<script src="../fnAction/FunctionAction.js"></script>
+		<script src="../fnAction/md5-min.js"></script>
+		<link href="CSS_ext/Cssext1.css" rel="stylesheet" />
+		<script type="text/javascript">
+			$(document).ready(function() {
+
+				mui.init({
+					//下拉刷新、上拉加载
+					pullRefresh: {
+						//...
+					},
+					//手势配置
+					gestureConfig: {
+						//...
+					},
+					//侧滑关闭
+					swipeBack: true, //Boolean(默认false)启用右滑关闭功能
+
+					//监听Android手机的back、menu按键
+					keyEventBind: {
+						backbutton: true, //Boolean(默认true)关闭back按键监听
+						menubutton: false //Boolean(默认true)关闭menu按键监听
+					},
+					//处理窗口关闭前的业务
+					beforeback: function() {
+						//... //窗口关闭前处理其他业务详情点击 ↑ "关闭页面"链接查看
+					},
+					preloadPages: [
+						{
+							url:"State.html",
+							id:"State"
+						}
+					]
+				})
+				window.addEventListener("preAct", function() {
+					var extdata = event.detail.extdata;
+					var obj = new Object();
+					obj.ShipperCode = extdata;
+					$.ActionFn.sendData("GetMyMissionDetail", obj, StateSuccess);
+				})
+				function StateSuccess(msg) {
+					$.ActionFn.setPagesData(msg.Content, "carInfo");
+					$("#carinfo").val(JSON.stringify((msg.Content)));
+
+					$("#fachedanhao").text(msg.Content.RtnList[0].ShipperCode);
+					$("#shifazhongxin").text(msg.Content.RtnList[0].Origin);
+					$("#mudizhongxin").text(msg.Content.RtnList[0].Destination);
+					$("#banxianmingcheng").text(msg.Content.RtnList[0].RouteName);
+					$("#renwuleixing").text(msg.Content.RtnList[0].ShipperTypeStr);
+
+					$("#diaodurenyuan").text(msg.Content.RtnList[0].SchedulingPerson);
+
+					var details = msg.Content.RtnList;
+
+					for(var i = 0; i < details.length; i++) {
+
+						var tbody = "";
+
+						if(i == 0) {
+							tbody += '<tbody  oid="' + details[i].ID + '" style="display:none"  maxlength="' + (details.length - 1) + '"  id="tbody' + i + '"><tr><td rowspan="2" style="width:10%"><img class="btnPrev" src="../Images/Weather/zuo.png"  nowlength="' + i + '"   maxlength="' + (details.length - 1) + '"  /></td><td style="width:10%"> <img src="../Images/State/zd%20(2).png" /></td><td style="width:20%">';
+							tbody += '始发站:</td><td style="width:50%">' + details[i].NodeName + '</td><td rowspan="2" style="width:10%"><img src="../Images/Weather/you.png"    maxlength="' + (details.length - 1) + '"  nowlength="' + i + '" class="btnNext" /></td></tr>';
+							tbody += '  <tr><td><img src="../Images/State/qd.png" /></td><td>出发:</td> <td><span class="SendTime">' + details[i + 1].SendDateTime + '</span></td></tr>';
+						} else if(i == details.length - 1) {
+							tbody += '<tbody oid="' + details[i].ID + '"  style="display:none"  maxlength="' + (details.length - 1) + '"  id="tbody' + i + '"><tr><td rowspan="2" style="width:10%"><img class="btnPrev" src="../Images/Weather/zuo.png"  nowlength="' + i + '"   maxlength="' + (details.length - 1) + '"  /></td><td style="width:10%"> <img src="../Images/State/zd%20(2).png" /></td><td style="width:20%">';
+							tbody += '终点站:</td><td style="width:50%">' + details[i].NodeName + '</td><td rowspan="2" style="width:10%"><img src="../Images/Weather/you.png"    maxlength="' + (details.length - 1) + '"  nowlength="' + i + '" class="btnNext" /></td></tr>';
+							tbody += '<tr><td><img src="../Images/State/zd.png" /></td><td>到达:</td><td><span class="EndTime">' + details[i].ReachDateTime + '</span></td></tr>';
+
+						} else {
+							tbody += '<tbody oid="' + details[i].ID + '"  style="display:none"  maxlength="' + (details.length - 1) + '"  id="tbody' + i + '"><tr><td rowspan="3" style="width:10%"><img class="btnPrev" src="../Images/Weather/zuo.png"  nowlength="' + i + '"   maxlength="' + (details.length - 1) + '"  /></td><td style="width:10%"> <img src="../Images/State/zd%20(2).png" /></td><td style="width:20%">';
+							tbody += '中途站:</td><td style="width:50%">' + details[i].NodeName + '</td><td rowspan="3" style="width:10%"><img src="../Images/Weather/you.png"    maxlength="' + (details.length - 1) + '"  nowlength="' + i + '" class="btnNext" /></td></tr>';
+							tbody += '<tr><td><img src="../Images/State/zd.png" /></td><td>到达:</td><td><span class="EndTime">' + details[i].ReachDateTime + '</span></td></tr>';
+							tbody += '  <tr><td><img src="../Images/State/qd.png" /></td><td>出发:</td> <td><span class="SendTime">' + details[i + 1].SendDateTime + '</span></td></tr>';
+						}
+
+						//首站出发（出发时间为空）
+						if(i == 0 && details[i + 1].SendDateTime == "") {
+							tbody += ' <tr><td colspan="5"><input type="button" nowtype="0"  state="1" oid="' + details[i].ID + '"    nextid="' + details[i + 1].ID + '"   class="btnOperate" value="出发" style="height: 35px; width: 180px; background-color: #03a2f5; color:white; margin:auto" id="btnSub" /></td></tr>';
+						}
+						//首站出发（出发时间不为空，已出发）
+						else if(i == 0 && details[i + 1].SendDateTime != "") {
+							tbody += ' <tr><td colspan="5"><input  nowtype="0"  oid="' + details[i].ID + '"  nextid="' + details[i + 1].ID + '"  disabled="disabled" type="button" value="货物已发出" style="height: 35px; width: 180px; background-color: #03a2f5; color:white; margin:auto" id="btnSub" /></td></tr>';
+						}
+						//末站到达（到达时间为空）
+						else if(i == details.length - 1 && details[i].ReachDateTime == "") {
+							tbody += ' <tr><td colspan="5"><input type="button" nowtype="1"   state="4" oid="' + details[i].ID + '"   nextid="' + details[i].ID + '"    class="btnOperate"  value="到站" style="height: 35px; width: 180px; background-color: #03a2f5; color:white; margin:auto" id="btnSub" /></td></tr>';
+						}
+						//末站到达（到达不为空，即已到站）
+						else if(i == details.length - 1 && details[i].ReachDateTime != "") {
+							tbody += ' <tr><td colspan="5"><input  nowtype="1"  oid="' + details[i].ID + '"    disabled="disabled" type="button" value="运输完成" style="height: 35px; width: 180px; background-color: #03a2f5; color:white; margin:auto" id="btnSub" /></td></tr>';
+						}
+						//（中途站）出发和到站时间都为空
+						else if(details[i + 1].SendDateTime == "" && details[i].ReachDateTime == "" && i != details.length - 1) {
+							tbody += ' <tr><td colspan="5"><input  state="2" nowtype="2"  type="button"  nextid="' + details[i + 1].ID + '"    oid="' + details[i].ID + '" class="btnOperate"  value="到站" style="height: 35px; width: 180px; background-color: #03a2f5; color:white; margin:auto" id="btnSub" /></td></tr>';
+						}
+						//（返程中途站）已到站，出发时间为空
+						else if(details[i + 1].SendDateTime == "" && details[i].ReachDateTime != "" && i != 0 && i == details.length - 2 && details[0].SinglePass == "2") {
+							tbody += ' <tr><td colspan="5"><input state="3"   nowtype="2"  type="button" nextid="' + details[i + 1].ID + '"  nextid="' + details[i + 1].ID + '"  oid="' + details[i].ID + '"   class="btnOperate" value="出发" style="height: 35px; width: 180px; background-color: #03a2f5; color:white; margin:auto" id="btnSub" /></td></tr>';
+						}
+						//（单程中途站）已到站，出发时间为空
+						else if(details[i + 1].SendDateTime == "" && details[i].ReachDateTime != "" && i != 0 && i != details.length - 1 && details[0].SinglePass == "1") {
+							tbody += ' <tr><td colspan="5"><input state="1"  nowtype="2"  type="button" nextid="' + details[i + 1].ID + '"  nextid="' + details[i + 1].ID + '"   state="' + details[0].ShipperState + '" oid="' + details[i].ID + '"   class="btnOperate" value="出发" style="height: 35px; width: 180px; background-color: #03a2f5; color:white; margin:auto" id="btnSub" /></td></tr>';
+						} //（中途站）出发到站时间都不为空
+						else if(details[i + 1].SendDateTime != "" && details[i].ReachDateTime != "" && i != 0 && i != details.length - 1) {
+							tbody += ' <tr><td colspan="5"><input   nowtype="2"  disabled="disabled" oid="' + details[i].ID + '"   type="button" value="货物已发出" style="height: 35px; width: 180px; background-color: #03a2f5; color:white; margin:auto" id="btnSub" /></td></tr>';
+						}
+
+						tbody += "</tbody>";
+						$("#luyou").append(tbody);
+
+					}
+
+					//第二次遍历，从离线缓存中获取已记录操作
+					for(var i = 0; i < details.length; i++) {
+						var offLineInfo = $.ActionFn.GetlocalStorage("offline" + details[i].ID);
+						//如果缓存文件不为空
+						if(offLineInfo != "" && offLineInfo != null) {
+
+							for(var k = 0; k < offLineInfo.length; k++) {
+
+								//如果是发车，发车时间显示到状态详情
+								if(offLineInfo[k].OperateType == 0) {
+									$("tbody[oid='" + offLineInfo[k].oid + "']").find(".SendTime").text(offLineInfo[k].OperDate);
+								}
+								//如果是倒车，倒车时间显示到状态详情
+								else {
+									$("tbody[oid='" + offLineInfo[k].oid + "']").find(".EndTime").text(offLineInfo[k].OperDate);
+								}
+							}
+
+						} //缓存判断结束
+
+					} //离线数据遍历结束
+
+					$("#tbody0").show();
+
+					$(".btnNext").on("tap", function() {
+
+						var maxlength = $(this).attr("maxlength");
+						var nowlength = $(this).attr("nowlength");
+						if(nowlength < maxlength) {
+							$("#tbody" + nowlength + "").hide();
+							$("#tbody" + (parseInt(nowlength) + 1) + "").show();
+						}
+					}); //下一页点击事件结尾
+
+					$(".btnPrev").on("tap", function() {
+						var maxlength = $(this).attr("maxlength");
+						var nowlength = $(this).attr("nowlength");
+						if(nowlength >= 1) {
+							$("#tbody" + nowlength + "").hide();
+							$("#tbody" + (parseInt(nowlength) - 1) + "").show();
+						}
+					}); //上一页点击事件结尾
+
+					//点击发车按钮
+
+					$("input[value='出发'").on("tap", function() {
+
+						$("#NowID").val($(this).attr("oid"));
+						$("#State").val($(this).attr("state"));
+						$("#NextID").val($(this).attr("NextID"));
+						$("#infotype").val($(this).attr("nowtype"));
+
+						var userinfo = $.ActionFn.getPagesData("userInfo");
+						var carinfo = JSON.parse($("#carinfo").val());
+						var UserObj = new Object();
+						UserObj.InfoType = $("#infotype").val();
+						UserObj.ShipperCode = carinfo.RtnList[0].ShipperCode; ///
+						UserObj.ShipperState = $("#State").val();
+						UserObj.OperUserName = userinfo.RtnLoginList[0].DriName; ///
+						UserObj.OperCompanyID = userinfo.RtnLoginList[0].UnitID; ///
+						UserObj.OperBranchID = userinfo.RtnLoginList[0].UnitBranch; ///
+						UserObj.SendCompanyName = userinfo.RtnLoginList[0].UnitName; ///
+						UserObj.NodeName = carinfo.RtnList[0].NodeName; ///
+						UserObj.X = "112.5"; ///
+						UserObj.Y = "31.5"; ///
+						UserObj.ID = $("#NextID").val(); ///
+						UserObj.DriType = userinfo.RtnLoginList[0].DriType; ///
+						UserObj.HRCode = userinfo.RtnLoginList[0].HRCode; ///
+
+						$.ActionFn.sendData("SendAndArriveBySend", UserObj, SendSuccess, SendDefeated);
+					}); //发车点击事件结尾
+
+					//点击到站按钮
+					$("input[value='到站'").on("tap", function() {
+						$("#NowID").val($(this).attr("oid"));
+						$("#State").val($(this).attr("state"));
+						$("#NextID").val($(this).attr("NextID"));
+						$("#infotype").val($(this).attr("nowtype"));
+						var userinfo = $.ActionFn.getPagesData("userInfo");
+						var carinfo = JSON.parse($("#carinfo").val());
+						var UserObj = new Object();
+						UserObj.InfoType = $("#infotype").val();
+						UserObj.ShipperCode = carinfo.RtnList[0].ShipperCode;
+						UserObj.ShipperState = $("#State").val();
+						UserObj.ReOperUserName = userinfo.RtnLoginList[0].DriName;
+						UserObj.ReOperCompanyID = userinfo.RtnLoginList[0].UnitID;
+						UserObj.ReOperBranchID = userinfo.RtnLoginList[0].UnitBranch;
+						UserObj.DisburdenCompanyName = userinfo.RtnLoginList[0].UnitName;
+						UserObj.NodeName = carinfo.RtnList[0].NodeName;
+						UserObj.X = "112.25";
+						UserObj.Y = "31.25"
+						UserObj.ID = $("#NowID").val();
+
+						$.ActionFn.sendData("SendAndArriveByArrive", UserObj, ArriveSuccess, ArriveDefeated);
+					}); //到站点击事件结尾
+
+					//发车成功返回事件
+					function SendSuccess(msg) {
+
+						if(msg.Rtn_Code == "0") {
+							mui.toast("发车成功");
+							var nid = $("#NowID").val();
+							$("tbody[oid='" + nid + "']").find(".SendTime").text(msg.Rtn_Msg);
+							$("input[oid='" + nid + "']").attr("disabled", "disabled");
+							$("input[oid='" + nid + "']").val("货物已发出");
+
+						} else {
+							mui.toast(msg.Rtn_Msg);
+						}
+
+					}
+
+					//到站成功返回事件
+					function ArriveSuccess(msg) {
+						if(msg.Rtn_Code == "0") {
+							mui.toast("到车成功");
+							var nid = $("#NowID").val();
+							$("tbody[oid='" + nid + "']").find(".EndTime").text(msg.Rtn_Msg);
+							if($("#State").val() == "2") {
+								$("input[oid='" + nid + "']").val("出发");
+							} else {
+								$("input[oid='" + nid + "']").attr("disabled", "disabled");
+								$("input[oid='" + nid + "']").val("运输完成");
+							}
+
+						} else {
+							mui.toast(msg.Rtn_Msg);
+						}
+					}
+
+					//发车失败返回事件（离线存储）
+					function SendDefeated() {
+						mui.toast("当前网络环境差，任务已被离线存储，请在离线任务中操作");
+
+						//提交失败的对象保存
+						var userinfo = $.ActionFn.getPagesData("userInfo");
+						var carinfo = JSON.parse($("#carinfo").val());
+						var UserObj = new Object();
+						UserObj.InfoType = $("#infotype").val();
+						UserObj.ShipperCode = carinfo.RtnList[0].ShipperCode; ///
+						UserObj.ShipperState = $("#State").val();
+						UserObj.OperUserName = userinfo.RtnLoginList[0].DriName; ///
+						UserObj.OperCompanyID = userinfo.RtnLoginList[0].UnitID; ///
+						UserObj.OperBranchID = userinfo.RtnLoginList[0].UnitBranch; ///
+						UserObj.SendCompanyName = userinfo.RtnLoginList[0].UnitName; ///
+						UserObj.NodeName = carinfo.RtnList[0].NodeName; ///
+						UserObj.X = "112.5"; ///
+						UserObj.Y = "31.5"; ///
+						UserObj.ID = $("#NextID").val(); ///
+						UserObj.DriType = userinfo.RtnLoginList[0].DriType; ///
+						UserObj.HRCode = userinfo.RtnLoginList[0].HRCode; ///
+						//获取当前时间
+						var date = new Date();
+						var nowDate = date.getFullYear() + "/" + (date.getMonth() + 1) + "/" + date.getDay() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+						//操作信息保存
+						var OperateObj = new Object();
+						OperateObj.Content = UserObj;
+						OperateObj.OperDate = nowDate;
+						OperateObj.infoType = $("#infotype").val();
+						OperateObj.OperateType = 0; //操作类型  0是发车 1是到车
+						OperateObj.shipperCode = UserObj.ShipperCode;
+						OperateObj.oid = $("#NowID").val();
+						OperateObj.OperateContent = carinfo.NodeName + "做发车操作";
+
+						//获取司机本地离线缓存
+						var offLineInfo = $.ActionFn.GetlocalStorage("offline" + UserObj.ID);
+
+						//如果缓存文件为空则新建
+						if(offLineInfo == "" || offLineInfo == null) {
+
+							//每一条操作记录保存到数组里面
+							var OffLine = new Array();
+							var length = OffLine.length;
+							OffLine[0] = OperateObj;
+							//重新向本地缓存写入数据
+							$.ActionFn.SetlocalStorage("offline" + UserObj.ID, OffLine);
+							var offLineInfo = $.ActionFn.GetlocalStorage("offline" + UserObj.ID);
+							mui.toast("离线发车操作保存成功！");
+							var nid = $("#NowID").val();
+							$("tbody[oid='" + nid + "']").find(".SendTime").text(nowDate);
+
+						}
+						//否则获取缓存文件，继续添加数据
+						else {
+							var OffLine = new Array();
+							OffLine = offLineInfo;
+							var length = OffLine.length;
+							OffLine[length] = OperateObj;
+							var state = true;
+							for(var i = 0; i < OffLine.length; i++) {
+								if($("#NowID").val() == OffLine[i].oid) {
+									state = false;
+								}
+							}
+							if(state == false) {
+								mui.alert('当前站点已经进行了离线发车操作！', '操作失败');
+
+							} else {
+								//重新向本地缓存文件写入数据
+								$.ActionFn.SetlocalStorage("offline" + UserObj.ID, OffLine);
+								mui.toast("离线发车操作保存成功！");
+								//获取当前时间，将发车时间显示在列表里
+								var nid = $("#NowID").val();
+								$("tbody[oid='" + nid + "']").find(".SendTime").text(nowDate);
+
+							}
+						}
+					} //离线发车结尾
+
+					//到站失败返回事件（离线存储）
+					function ArriveDefeated() {
+						mui.toast("当前网络环境差，任务已被离线存储，请在离线任务中操作");
+						var userinfo = $.ActionFn.getPagesData("userInfo");
+						var carinfo = JSON.parse($("#carinfo").val());
+						var UserObj = new Object();
+						UserObj.InfoType = $("#infotype").val();
+						UserObj.ShipperCode = carinfo.RtnList[0].ShipperCode; ///
+						UserObj.ShipperState = $("#State").val();
+						UserObj.ReOperUserName = userinfo.RtnLoginList[0].DriName; ///
+						UserObj.ReOperCompanyID = userinfo.RtnLoginList[0].UnitID; ///
+						UserObj.ReOperBranchID = userinfo.RtnLoginList[0].UnitBranch; ///
+						UserObj.DisburdenCompanyName = userinfo.RtnLoginList[0].UnitName; ///
+						UserObj.NodeName = carinfo.RtnList[0].NodeName; ///
+						UserObj.X = "112.25"; ///
+						UserObj.Y = "31.25" ///
+						UserObj.ID = $("#NowID").val(); ///
+						//获取当前时间
+						var date = new Date();
+						var nowDate = date.getFullYear() + "/" + (date.getMonth() + 1) + "/" + date.getDay() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+						//操作信息保存
+						var OperateObj = new Object();
+						OperateObj.Content = UserObj;
+						OperateObj.OperDate = nowDate;
+						OperateObj.infoType = $("#infotype").val();
+						OperateObj.OperateType = 1; //操作类型  0是发车 1是到车
+						OperateObj.shipperCode = UserObj.ShipperCode;
+						OperateObj.oid = $("#NowID").val();
+						OperateObj.OperateContent = carinfo.NodeName + "做到达操作";
+
+						//获取司机本地离线缓存
+						var offLineInfo = $.ActionFn.GetlocalStorage("offline" + UserObj.ID);
+
+						//如果缓存文件为空则新建
+						if(offLineInfo == "" || offLineInfo == null) {
+
+							//每一条操作记录保存到数组里面
+							var OffLine = new Array();
+							var length = OffLine.length;
+							OffLine[0] = OperateObj;
+							//重新向本地缓存写入数据
+							$.ActionFn.SetlocalStorage(OffLine, "offline" + UserObj.ID);
+							mui.toast("离线到车操作保存成功！");
+							var nid = $("#NowID").val();
+							$("tbody[oid='" + nid + "']").find(".EndTime").text(nowDate);
+
+						}
+						//否则获取缓存文件，继续添加数据
+						else {
+							var OffLine = new Array();
+							OffLine = offLineInfo;
+							var length = OffLine.length;
+							OffLine[length] = OperateObj;
+							var state = true;
+							for(var i = 0; i < OffLine.length; i++) {
+								if($("#NowID").val() == OffLine[i].oid) {
+									state = false;
+								}
+							}
+							if(state == false) {
+								mui.alert('当前站点已经进行了离线发车操作！', '操作失败');
+							} else {
+								//重新向本地缓存文件写入数据
+								$.ActionFn.SetlocalStorage(OffLine, "offline" + UserObj.ID);
+								mui.toast("离线到车操作保存成功！");
+								var nid = $("#NowID").val();
+								$("tbody[oid='" + nid + "']").find(".EndTime").text(nowDate);
+							}
+						}
+					} //到站失败结尾
+
+				} //接口成功结尾
+
+			});
+			function toLocation() {
+				var data = $("#fachedanhao").text();
+				$.ActionFn.selfFireFunction("State","preAct",data);
+				$.ActionFn.selfOpenWindow("State","State.html");
+			}
+		</script>
+
+		<style>
+			.title {
+				margin: 20px 15px 10px;
+				color: #03a2f5;
+				font-size: 15px;
+			}
+			
+			.img-after {
+				width: 20px;
+				height: 20px;
+				vertical-align: middle;
+				margin-left: 10px;
+			}
+			
+			.span-img-after {
+				padding: 11px 65px 11px 15px;
+			}
+			
+			#luyou tr {
+				border-bottom: solid 1px #C8C7CC;
+				height: 80px;
+				font-size: 1.2em;
+			}
+			
+			#luyou img {
+				height: 38px;
+			}
+			
+			.addressname {
+				margin-left: 35px;
+			}
+			
+			.wd {
+				position: relative;
+				top: -18px;
+			}
+			span {
+				text-align: left
+			}
+			
+			#luyou td {
+				text-align: center;
+			}
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">任务详情</h1>
+		</header>
+		<div class="mui-content">
+			<div class="mui-card" style="margin-bottom: 35px;">
+				<div class="mui-card-header ">发车单号：<span id="fachedanhao" onclick="toLocation()"></span></div>
+				<div class="mui-card-header">始发中心：<span id="shifazhongxin"></span></div>
+				<div class="mui-card-header">目的中心：<span id="mudizhongxin"></span></div>
+				<div class="mui-card-header">班线名称：<span id="banxianmingcheng"></span></div>
+				<div class="mui-card-header">任务类型：<span id="renwuleixing"></span></div>
+				<div class="mui-card-header">任务时间：<span id="renwushijian"></span></div>
+				<div class="mui-card-header">调度人员：<span id="diaodurenyuan"></span></div>
+				<div class="mui-card-header" style="position: initial; text-align:center">途经站点：&nbsp;&nbsp;&nbsp;</div>
+
+				<table style="width:100%" id="luyou" cellpadding="0" cellspacing="0">
+				</table>
+
+			</div>
+			<input type="hidden" id="carinfo" />
+			<input type="hidden" id="NowID" />
+			<input type="hidden" id="State" />
+			<input type="hidden" id="NextID" />
+			<input type="hidden" id="infotype" />
+		</div>
+	</body>
+
+</html>

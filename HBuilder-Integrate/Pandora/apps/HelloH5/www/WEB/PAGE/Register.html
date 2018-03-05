@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title></title>
+		<!--标准mui.css-->
+    	<link rel="stylesheet" type="text/css" href="../css/mui.min.css">
+		<!--App自定义的css-->
+	    <link rel="stylesheet" type="text/css" href="../css/app.css" />
+	    <script type="text/javascript" src="../js/mui.min.js"></script>
+	    <link rel="stylesheet" type="text/css" href="CSS_ext/Cssext1.css"/>
+	    
+	    <script type="text/javascript" src="js/jquery-2.1.4.min.js"></script>
+	    <script type="text/javascript" src="../fnAction/FunctionAction.js"></script>
+	    <script type="text/javascript" src="../fnAction/md5-min.js"></script> 
+		<style>
+			.area {
+				margin: 20px auto 0px auto;
+			}
+			.mui-input-group:first-child {
+				margin-top: 20px;
+			}
+			.mui-input-group label {
+				width: 31%;
+			}
+			.mui-input-row label~input,
+			.mui-input-row label~select,
+			.mui-input-row label~textarea {
+				width: 69%;
+			}
+			.mui-checkbox input[type=checkbox],
+			.mui-radio input[type=radio] {
+				top: 6px;
+			}
+			.mui-content-padded {
+				margin-top: 25px;
+			}
+			.mui-btn {
+				padding: 10px;
+			}
+		</style>
+		<script type="text/javascript">
+			 mui.init({
+	            //下拉刷新、上拉加载
+	            pullRefresh: {
+	                //...
+	            },
+	            //手势配置
+	            gestureConfig: {
+	                //...
+	            },
+	            //侧滑关闭
+	            swipeBack: true, //Boolean(默认false)启用右滑关闭功能
+	
+	            //监听Android手机的back、menu按键
+	            keyEventBind: {
+	                backbutton: false,  //Boolean(默认true)关闭back按键监听
+	                menubutton: false   //Boolean(默认true)关闭menu按键监听
+	            },
+	            //处理窗口关闭前的业务
+	            beforeback: function () {
+	                //... //窗口关闭前处理其他业务详情点击 ↑ "关闭页面"链接查看
+	            },
+	            preloadLimit: 1//预加载窗口数量限制(一旦超出,先进先出)默认不限制
+       		});
+       		$(function(){
+       			$('#RegisterConfirm').click(function(){
+       				var RegisterObj=new Object();
+       				//姓名
+       				if ($('#RegisterName').val() != '') {
+                   		 RegisterObj.DriName=$('#RegisterName').val();
+	                }
+	                else {
+	                	mui.alert('姓名不允许为空','警告',function(){})
+	                	return;
+	                }
+	       			//手机号
+	                if ($('#RegisterPhone').val() != '') {
+	                    var isPhone = /^1[3578]\d{9}$/;
+	                    if (isPhone.test($('#RegisterPhone').val())) {
+	                        RegisterObj.DriPhone=$('#RegisterPhone').val();
+	                    }
+	                    else {
+	                        mui.alert('手机号格式错误','警告',function(){})
+	                    }
+	                }
+	                else {
+	                    mui.alert('手机号不允许为空','警告',function(){})
+	                }
+	                //身份证号
+			        var IDCard =$('#RegisterCard').val();
+			        //15位和18位身份证号码的正则表达式
+			        var regIdCard = /^(^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$)|(^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])((\d{4})|\d{3}[Xx])$)$/;
+			        //如果通过该验证，说明身份证格式正确，但准确性还需计算
+			        if(IDCard!=''){
+			        	 if (regIdCard.test(IDCard)) {
+				            if (IDCard.length == 18) {
+				                var idCardWi = new Array(7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2); //将前17位加权因子保存在数组里
+				                var idCardY = new Array(1, 0, 10, 9, 8, 7, 6, 5, 4, 3, 2); //这是除以11后，可能产生的11位余数、验证码，也保存成数组
+				                var idCardWiSum = 0; //用来保存前17位各自乖以加权因子后的总和
+				                for (var i = 0; i < 17; i++) {
+				                    idCardWiSum += IDCard.substring(i, i + 1) * idCardWi[i];
+				                }
+				                var idCardMod = idCardWiSum % 11;//计算出校验码所在数组的位置
+				                var idCardLast = IDCard.substring(17);//得到最后一位身份证号码
+				
+				                //如果等于2，则说明校验码是10，身份证号码最后一位应该是X
+				                if (idCardMod == 2) {
+				                    if (idCardLast == "X" || idCardLast == "x") {
+				                        RegisterObj.CardCode = IDCard;
+				                    } else {
+				                        mui.alert('身份证号格式错误','警告',function(){})
+				                        return;
+				                    }
+				                } else {
+				                    //用计算出的验证码与最后一位身份证号码匹配，如果一致，说明通过，否则是无效的身份证号码
+				                    if (idCardLast == idCardY[idCardMod]) {
+				                         RegisterObj.CardCode = IDCard;
+				                    } else {
+				                        mui.alert('身份证号格式错误','警告',function(){})
+				                        return;
+				                    }
+				                }
+				            }
+				        } else {
+				            mui.alert('身份证号格式错误','警告',function(){})
+				            return;
+				        }
+			        }else {
+				        mui.alert('身份证不允许为空','警告',function(){})
+				        return;
+				    }
+       				//密码
+       				if($('#RegisterPassword').val() =='')
+       				{
+       					mui.alert('请输入密码','警告',function(){})
+					    return;
+       					
+       				}
+       				else if($('#RegisterPassword_confirm').val() =='')
+       				{
+       					mui.alert('请再次输入密码','警告',function(){})
+					    return;
+       				}
+       				else{
+       					if($('#RegisterPassword_confirm').val()==$('#RegisterPassword').val())
+	       				{
+	       					RegisterObj.AppPassWord=$('#RegisterPassword_confirm').val();
+	       				}
+	       				else{
+	       					mui.alert('两次密码不一致，请重新输入','警告',function(){})
+					        return;
+	       				}
+       				}
+       				$.ActionFn.sendData("Register", RegisterObj, CallBackSuccess,callBackFinish);
+       			})
+       			function CallBackSuccess(returndata){
+		        	if(returndata.Rtn_Code=='0'){
+		        		mui.toast(returndata.Rtn_Msg,'警告',function(){});
+		        		mui.openWindow({
+			                url:'Login.html',
+			                id: 'Login.html',
+			                createNew:false,//是否重复创建同样id的webview，默认为false:不重复创建，直接显示
+			            })
+		        	}
+		        	else{
+		        		mui.alert(returndata.Rtn_Msg,'警告',function(){})
+		        	}
+		        }
+       			function callBackFinish(){}
+       		})
+		</script> 
+	</head>
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">注册</h1>
+		</header>
+		<div class="mui-content">
+			<form class="mui-input-group">
+				<div class="mui-input-row">
+					<label>姓名</label>
+					<input id='RegisterName' type="text" class="mui-input-clear mui-input" placeholder="请输入姓名">
+				</div>
+				<div class="mui-input-row">
+					<label>手机号</label>
+					<input id='RegisterPhone' type="email" class="mui-input-clear mui-input" placeholder="请输入手机号">
+				</div>
+				<div class="mui-input-row">
+					<label>身份证号</label>
+					<input id='RegisterCard' type="email" class="mui-input-clear mui-input" placeholder="请输入身份证号">
+				</div>
+				<div class="mui-input-row">
+					<label>密码</label>
+					<input id='RegisterPassword' type="password" class="mui-input-clear mui-input" placeholder="请输入密码">
+				</div>
+				<div class="mui-input-row">
+					<label>确认密码</label>
+					<input id='RegisterPassword_confirm' type="password" class="mui-input-clear mui-input" placeholder="请确认密码">
+				</div>
+			</form>
+			<div class="mui-content-padded">
+				<button id='RegisterConfirm' class="mui-btn mui-btn-block mui-btn-primary">注册</button>
+			</div>
+		</div>
+		<!--<script>
+			(function($, doc) {
+				$.init();
+				$.plusReady(function() {
+					var settings = app.getSettings();
+					var regButton = doc.getElementById('reg');
+					var accountBox = doc.getElementById('account');
+					var passwordBox = doc.getElementById('password');
+					var passwordConfirmBox = doc.getElementById('password_confirm');
+					var emailBox = doc.getElementById('email');
+					regButton.addEventListener('tap', function(event) {
+						var regInfo = {
+							account: accountBox.value,
+							password: passwordBox.value,
+							email: emailBox.value
+						};
+						var passwordConfirm = passwordConfirmBox.value;
+						if (passwordConfirm != regInfo.password) {
+							plus.nativeUI.toast('密码两次输入不一致');
+							return;
+						}
+						app.reg(regInfo, function(err) {
+							if (err) {
+								plus.nativeUI.toast(err);
+								return;
+							}
+							plus.nativeUI.toast('注册成功');
+							$.openWindow({
+								url: 'login.html',
+								id: 'login',
+								show: {
+									aniShow: 'pop-in'
+								}
+							});
+						});
+					});
+				});
+			}(mui, document));
+		</script>-->
+	</body>
+</html>

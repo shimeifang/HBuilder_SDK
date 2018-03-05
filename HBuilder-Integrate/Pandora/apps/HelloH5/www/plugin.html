@@ -1,0 +1,87 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+        <meta name="HandheldFriendly" content="true"/>
+        <meta name="MobileOptimized" content="320"/>
+        <title>H5Plugin</title>
+        <script type="text/javascript" src="./js/common.js"></script>
+        <script type="text/javascript" src="jsaip/pdr.js"></script>>
+        
+        <script type="text/javascript" src="js/BDPushPlugin.js"></script>
+         <script type="text/javascript" src="js/pluginConnection.js"></script>
+         <script type="text/javascript" src="js/testplugin.js"></script>
+         
+        <script type="text/javascript" src="js/VoiceSpeak.js"></script>
+        
+        <script type="text/javascript">
+            
+            function pluginVoiceSpeak() {
+                //第一个参数：报读的内容
+                plus.VoiceSpeak.PluginVoiceSpeak("语音报读内容1 1 2 3 4 5 6 7 890,my name is shimeifang", function( result ) {alert(result) },function(result){alert(result)});
+                
+            }
+        
+            
+        function pluginShow() {
+        
+             plus.VoiceSpeak.PluginAudioPlay("", function( result ) { },function(result){alert(result)});
+          
+        }
+        
+        function postStr(latitude){
+            
+            alert(latitude);
+
+
+        }
+
+        
+        function pluginShow11() {
+            alert(plus.pluginConnection.PluginTestFunctionSync(""));
+        }
+        
+        function pluginGetString()
+        {
+            alert(plus.plugintest.PluginTestFunctionSync("Html5","Plus","SyncFunction","MultiArgument!"));
+        }
+        
+        function pluginGetStringArrayArgu()
+        {
+            var Argus = plus.plugintest.PluginTestFunctionSyncArrayArgu(["Html5","Plus","SyncFunction","ArrayArgument!"]);
+            alert( Argus.RetArgu1 + "_" +  Argus.RetArgu2 + "_" + Argus.RetArgu3  + "_" + Argus.RetArgu4 );
+        }
+        
+        function PostNotification(){
+            // 通过NativeJS发送消息到原生层
+            var notiClass = plus.ios.importClass("NSNotificationCenter");
+            notiClass.defaultCenter().postNotificationNameobject("SendDataToNative","HTML Page Send Data By NJS");
+        }
+
+        function AuthenticateUser()
+        {
+            plus.plugintest.AuthenticateUser(function(message){
+                                                            alert(message.state + '------' + message.message);
+                                                            },
+                                             function(message){
+                                                            alert(message.state + '------' + message.message);
+                                                            });
+        }
+        
+            </script>
+        <link rel="stylesheet" href="./css/common.css" type="text/css" charset="utf-8"/>
+    </head>
+    <body>
+        <header>
+            <div class="nvtt">HBuilder-Plugin</div>
+        </header>
+        <div id="dcontent" class="dcontent">
+            <br/>
+
+           <div class="button" onclick="pluginVoiceSpeak()">pluginVoiceSpeak()</div>
+           <div class="button" onclick="pluginShow()">avAuidioPlay()</div>
+            <br/>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,139 @@
+﻿<!DOCTYPE html>
+<html class="ui-page-login">
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<title>地图</title>
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<script src="../fnAction/jquery-2.1.4.min.js"></script>
+		<link href="../fonts/mapIcon/iconfont.css" rel="stylesheet" />
+		<script src="js/mui.min.js"></script>
+		<script type="text/javascript" src="http://api.map.baidu.com/api?v=15&ak=mEkDKP7oUmTWLV2fUd373E7F"></script>
+		<script type="text/javascript" src="http://developer.baidu.com/map/jsdemo/demo/convertor.js"></script>
+		<style>
+			.bar-span {
+				font-size: 11px
+			}
+			
+			.bar-img-span {
+				font-size: 25px;
+				position: relative;
+				top: 7px;
+			}
+		</style>
+		<script>
+			function searchArea(tag) {
+				var seachaddress = "";
+				switch(tag) {
+					case 1:
+						searchaddress = "加油站";
+						break;
+					case 2:
+						searchaddress = "汽车维修";
+						break;
+					case 3:
+						searchaddress = "收费站";
+						break;
+				}
+				map.clearOverlays();
+				var point = new BMap.Point(121.442559, 31.297737);
+				var circle = new BMap.Circle(point, 2000, {
+					fillColor: "blue",
+					strokeWeight: 1,
+					fillOpacity: 0.3,
+					strokeOpacity: 0.3
+				});
+				map.addOverlay(circle);
+				var local = new BMap.LocalSearch(map, {
+					renderOptions: {
+						map: map,
+						autoViewport: false
+					}
+				});
+				var marker = new BMap.Marker(point); // 创建标注
+				map.addOverlay(marker);
+				local.searchNearby(searchaddress, point, 2000);
+			}
+		</script>
+	</head>
+
+	<body>
+		<nav class="mui-bar mui-bar-tab">
+			<a class="mui-tab-item " href="javascript:" onclick="searchArea(1)">
+				<i class="icon iconfont bar-img-span">&#xe600;</i><br />
+				<span class="mui-tab-label bar-span">加油站</span>
+			</a>
+			<a class="mui-tab-item" href="javascript:" onclick="searchArea(2)">
+				<i class="icon iconfont bar-img-span">&#xe601;</i><br />
+				<span class="mui-tab-label bar-span">维修站</span>
+			</a>
+			<a class="mui-tab-item" href="javascript:" onclick="searchArea(3)">
+				<i class="icon iconfont bar-img-span">&#xe602;</i><br />
+				<span class="mui-tab-label bar-span">收费站</span>
+			</a>
+		</nav>
+		<div class="mui-content">
+			<div id="allmap" style="width:100%;height:100px"></div>
+			<script>
+				// 百度地图API功能
+				var height = screen.height;
+				document.querySelector("#allmap").style.height = (height - 100) + "px";
+				var map = new BMap.Map("allmap"); // 创建Map实例
+				//var location = $.fn.nativeGetGpsLocation();
+				//var locationArray = location.split(",");
+				//var point = new BMap.Point(locationArray[0], locationArray[1]);
+				var point = new BMap.Point(121.442559, 31.297737);
+
+				//map.addControl(new BMap.MapTypeControl());   //添加地图类型控件
+				//map.setCurrentCity("北京");          // 设置地图显示的城市 此项是必须设置的
+				//map.enableScrollWheelZoom(true);     //开启鼠标滚轮缩放
+			</script>
+			<script>
+				mui.plusReady(function() {
+
+					plus.geolocation.getCurrentPosition(function(position) {
+						var _lat = position.coords.latitude; //纬度
+						var _lon = position.coords.longitude //经度
+							//alert(_lat+"&&"+_lon);
+						var point = new BMap.Point(_lon, _lat);
+						BMap.Convertor.translate(point, 0, function(point) {
+							map.centerAndZoom(point, 15); // 初始化地图,设置中心点坐标和地图级别
+							var marker = new BMap.Marker(point); // 创建标注
+							map.addOverlay(marker);
+						})
+
+					}, function(e) {
+						mui.toast('获取地理位置出错！');
+					}, {
+						geocode: false
+					});
+				});
+				mui.init({
+					pullRefresh: {
+						//...
+					},
+					//手势配置
+					gestureConfig: {
+						//...
+					},
+					//侧滑关闭
+					swipeBack: true, //Boolean(默认false)启用右滑关闭功能
+
+					//监听Android手机的back、menu按键
+					keyEventBind: {
+						backbutton: true, //Boolean(默认true)关闭back按键监听
+						menubutton: false //Boolean(默认true)关闭menu按键监听
+					},
+					//处理窗口关闭前的业务
+					beforeback: function() {
+						//... //窗口关闭前处理其他业务详情点击 ↑ "关闭页面"链接查看
+					}
+				})
+			</script>
+		</div>
+	</body>
+
+</html>

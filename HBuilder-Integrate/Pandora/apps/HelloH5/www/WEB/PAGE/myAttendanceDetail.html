@@ -1,0 +1,128 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>考勤明细</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <!--标准mui.css-->
+    <script src="../../js/common.js"></script>
+    <link rel="stylesheet" href="../../css/common.css" />
+    <link rel="stylesheet" href="../css/mui.min.css">
+    <link rel="stylesheet" type="text/css" href="CSS_ext/Cssext1.css" />
+    <script src="../fnAction/jquery-2.1.4.min.js"></script>
+    <script src="../fnAction/FunctionAction.js"></script>
+    <script src="../fnAction/md5-min.js"></script>
+    
+    <style>
+        .title {
+            margin: 20px 15px 7px;
+            color: #03a2f5;
+            font-size: 15px;
+        }
+        .lessline
+        {
+        	line-height: 1em;
+        }
+    </style>
+</head>
+<body>
+    <header class="mui-bar mui-bar-nav">
+        <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+        <h1 class="mui-title">考勤明细</h1>
+    </header>
+    <div id="content" class="mui-content">
+        <ul class="mui-table-view">
+            <li class="mui-table-view-cell table-title">
+                <div class="mui-grid-view mui-row">
+                    <div class="mui-col-xs-3"><span class="mui-h5">考勤类型</span></div>
+                    <div class="mui-col-xs-3"><span class="mui-h5">开始时间</span></div>
+                    <div class="mui-col-xs-3"><span class="mui-h5">结束时间</span></div>
+                    <div class="mui-col-xs-3"><span class="mui-h5">天数</span></div>
+                </div>
+            </li>
+        </ul>
+        <ul class="mui-table-view" id="contentAttendenceDetail">
+            <li class="mui-table-view-cell ">
+                <div class="mui-grid-view mui-row">
+                    <div class="mui-col-xs-3"><span class="mui-h5">病假</span></div>
+                    <div class="mui-col-xs-3"><span class="mui-h5">11</span></div>
+                    <div class="mui-col-xs-3"><span class="mui-h5">11</span></div>
+                    <div class="mui-col-xs-3"><span class="mui-h5">11</span></div>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <script type="text/javascript" src="js/mui.min.js"></script>
+    <script>
+        mui.plusReady(function() {
+				plus.webview.currentWebview().setStyle({
+					scrollIndicator: 'none'
+				});
+			});
+        window.addEventListener("preAct",function(){
+        	
+        	var extdata = event.detail.extdata;
+        	var objectData = new Object();
+	        objectData.AttendanceMonth = extdata;
+	        objectData.DirID = $.ActionFn.GetlocalStorage("userInfo").RtnLoginList[0].DriID;
+	        $.ActionFn.sendData("GetAttendanceDetail", objectData, successCallBac)
+	        function successCallBac(returnData) {
+	            if (returnData.Rtn_Code == "0") {
+	                var dataBase = returnData.Content.RtnAttendanceDetailList;
+	                var ulDom= document.querySelector("#contentAttendenceDetail");
+	                ulDom.innerHTML="";
+	                var n = dataBase.length;
+	                for (var i = 0; i < n; i++) {
+	                    var liNodes = document.createElement('li');
+	                    liNodes.classList.add("mui-table-view-cell");
+	                    var divLiNode = document.createElement('div');
+	                    divLiNode.classList.add("mui-grid-view");
+	                    divLiNode.classList.add("mui-row");
+	                    var htmlStr = '<div class="mui-col-xs-3"><span class="mui-h5">' + dataBase[i].ITEMNAME + '</span></div><div class="mui-col-xs-3"><span class="mui-h6 lessline">' + dataBase[i].AttStartTime + '</span></div><div class="mui-col-xs-3"><span class="mui-h6 lessline">' + dataBase[i].AttEndTime + '</span></div><div class="mui-col-xs-3"><span class="mui-h5">' + dataBase[i].AttendanceDay + '</span></div>';
+	                    divLiNode.innerHTML = htmlStr;
+	                    liNodes.appendChild(divLiNode);
+	                    ulDom.appendChild(liNodes);
+	                }
+	            }
+	            else if (returnData.Rtn_Code == "1") {
+	                mui.toast('当前没有考勤信息。');
+	            }
+	            else if (returnData.Rtn_Code == "-1") {
+	                mui.alert(returnData.Rtn_Msg, '警告', function () {
+	                });
+	            }
+	        }
+        })
+        
+        mui.init({
+            //下拉刷新、上拉加载
+            pullRefresh: {
+                //...
+            },
+            //手势配置
+            gestureConfig: {
+                //...
+            },
+            //侧滑关闭
+            swipeBack: true, //Boolean(默认false)启用右滑关闭功能
+
+            //监听Android手机的back、menu按键
+            keyEventBind: {
+                backbutton: false,  //Boolean(默认true)关闭back按键监听
+                menubutton: false   //Boolean(默认true)关闭menu按键监听
+            },
+            //处理窗口关闭前的业务
+            beforeback: function () {
+                //... //窗口关闭前处理其他业务详情点击 ↑ "关闭页面"链接查看
+               $.ActionFn.selfFireFunction("myAttendance","preAct","");
+            },
+            //设置状态栏颜色
+          
+            preloadLimit: 1//预加载窗口数量限制(一旦超出,先进先出)默认不限制
+        })
+        
+    </script>
+</body>
+</html>

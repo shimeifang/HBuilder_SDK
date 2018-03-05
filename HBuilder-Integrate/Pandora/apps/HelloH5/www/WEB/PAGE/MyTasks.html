@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>MyTasks</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link href="Swiper/css/idangerous.swiper.css" rel="stylesheet" />
+    <link href="Swiper/css/idangerous.swiper.scrollbar.css" rel="stylesheet" />
+    <!--标准mui.css-->
+    <script src="../../js/common.js"></script>
+    <link rel="stylesheet" href="../../css/common.css" />
+    <link rel="stylesheet" href="../css/mui.min.css">
+    <!--App自定义的css-->
+    <link rel="stylesheet" type="text/css" href="../css/app.css" />
+    <link href="CSS_ext/Cssext1.css" rel="stylesheet" />
+    <link href="css/mui.picker.min.css" rel="stylesheet" />
+    <script src="../fnAction/jquery-2.1.4.min.js"></script>
+    <script src="../fnAction/FunctionAction.js"></script>
+    <script src="../fnAction/md5-min.js"></script>
+    <style type="text/css">
+        .MainTitle {
+            width: 100%;
+            height: 2em;
+            line-height: 2em;
+        }
+
+        .TitLeft {
+            width: 27%;
+            text-align: left;
+            color: #03a2f5;
+            float: left;
+            text-align: center;
+            height: 2em;
+            line-height: 2em;
+        }
+
+        .TitRight {
+            width: 73%;
+            float: left;
+            height: 2em;
+            line-height: 2em;
+            text-align: center;
+        }
+
+        #OrderID {
+            width: 65%;
+            height: 2em;
+            float: left;
+        }
+
+        #OrderSerch {
+            width: 30%;
+            height: 2.4em;
+            float: right;
+        }
+        /*-------------------*/
+        .swiper-container {
+            width: 100%;
+            height: auto;
+            text-align: center;
+        }
+
+        .swiper-slide {
+            width: 800px;
+            background: #fff;
+        }
+
+        #OrderTable {
+            width: 100%;
+        }
+
+            #OrderTable tr {
+                width: 20%;
+                height: 2.5em;
+                border-bottom: 1px solid #DFDFDF;
+            }
+
+        .swiper-scrollbar {
+            width: 100%;
+            height: 4px;
+            position: absolute;
+            left: 0;
+            bottom: 5px;
+            z-index: 1;
+        }
+
+        form {
+            background-color: white;
+            line-height: 2em;
+        }
+        form:first-child {
+                margin-top: 15px;
+                border-bottom: 1px solid #eee;
+            }
+
+        .mui-input-row {
+            padding: 11px 15px;
+        }
+        .mui-input-row:nth-last-of-type(2) {
+                border-bottom: 1px solid #eee;
+                padding-top: 0px;
+            }
+        .mui-input-row:nth-child(3) {
+                padding: 5px 15px;
+                line-height: 1em;
+            }
+        .timeSelect {
+            font-size:12px;
+        }
+    </style>
+</head>
+<body>
+    <header class="mui-bar mui-bar-nav" style=" background-color: #03A2F5; ">
+        <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+        <h1 style="color:white" class="mui-title">我的任务</h1>
+    </header>
+    <div id="content" class="mui-content">
+        <form>
+            
+            <div class="mui-input-row">
+                <div class="TitLeft"><span class="mui-h5 search-span">发车时间:</span></div>
+                <div class="TitRight">
+                    <input type="text" class="timeSelect" id="StartTime" style=" width:45%; height:34px; float:left;"><div style="float:left; width:10%; height:2em; ">至</div>
+                    <input type="text" class="timeSelect" id="EndTime" style=" width:45%; height:34px; float:right;">
+                </div>
+            </div>
+            
+            <div class="mui-input-row">
+                <div class="TitLeft"><span class="mui-h5 search-span">运输单号:</span></div>
+                <div class="TitRight"><input type="text" id="OrderID" class="mui-input-numbox"><button type="button" id="OrderSerch" class="mui-btn mui-btn-primary">查找</button></div>
+            </div>
+            
+            <div class="mui-input-row">
+                <div class="mui-col-sm-6 mui-col-xs-6" style="float:left"><span class="search-span">查看详情</span></div>
+                <div class="mui-col-sm-6 mui-col-xs-6" style="float:left;text-align:right;"><span style="color: #F8C57E;" class="mui-h6">向右滑动查看更多-></span> </div>
+            </div>
+        </form>
+        <form>
+            <div class="swiper-container">
+                <!--<div class="swiper-scrollbar"></div>-->
+                <div class="swiper-wrapper">
+                    <div class="swiper-slide">
+                        <table id="OrderTable">
+                            <!--<thead>
+                                <tr>
+                                    <th>运输单号</th>
+                                    <th>路线名称</th>
+                                    <th>发车时间</th>
+                                    <th>结束时间</th>
+                                    <th>状态</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><a href="#">DG213131223465</a></td>
+                                    <td>上海-北京</td>
+                                    <td>2016-07-26</td>
+                                    <td>2016-07-26</td>
+                                    <td>正常</td>
+                                </tr>
+                                <tr>
+                                    <td><a href="#">DG213131223465</a></td>
+                                    <td>上海-北京</td>
+                                    <td>2016-07-26</td>
+                                    <td>2016-07-26</td>
+                                    <td>正常</td>
+                                </tr>
+                                <tr>
+                                    <td><a href="#">DG213131223465</a></td>
+                                    <td>上海-北京</td>
+                                    <td>2016-07-26</td>
+                                    <td>2016-07-26</td>
+                                    <td>正常</td>
+                                </tr>
+                                <tr>
+                                    <td><a href="#">DG213131223465</a></td>
+                                    <td>上海-北京</td>
+                                    <td>2016-07-26</td>
+                                    <td>2016-07-26</td>
+                                    <td>正常</td>
+                                </tr>
+                            </tbody>-->
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <script src="Swiper/js/idangerous.swiper.min.js"></script>
+    <script src="Swiper/js/idangerous.swiper.scrollbar-2.1.js"></script>
+    <script>
+        var mySwiper = new Swiper('.swiper-container', {
+            scrollContainer: true,
+            scrollbar: {
+                container: '.swiper-scrollbar'
+            }
+        })
+    </script>
+    <script src="js/mui.js"></script>
+    <script src="js/mui.picker.min.js"></script>
+    <script>
+        mui.plusReady(function () {
+            console.log("当前页面URL：" + plus.webview.currentWebview().getURL());
+        });
+        mui.init({
+            //下拉刷新、上拉加载
+            pullRefresh: {
+                //...
+            },
+            //手势配置
+            gestureConfig: {
+                //...
+            },
+            //侧滑关闭
+            swipeBack: true, //Boolean(默认false)启用右滑关闭功能
+
+            //监听Android手机的back、menu按键
+            keyEventBind: {
+                backbutton: false,  //Boolean(默认true)关闭back按键监听
+                menubutton: false   //Boolean(默认true)关闭menu按键监听
+            },
+            //处理窗口关闭前的业务
+            beforeback: function () {
+                //... //窗口关闭前处理其他业务详情点击 ↑ "关闭页面"链接查看
+            },
+            preloadLimit: 1//预加载窗口数量限制(一旦超出,先进先出)默认不限制
+        });
+        window.addEventListener("preAct",function(){
+        	
+        })
+        mui(".timeSelect").each(function (_sender) {
+            this.addEventListener("tap", function (e) {
+                var options = {
+                    type: "date",
+                    beginYear: 2010,
+                    endYear:2020
+                };
+                var picker = new mui.DtPicker(options);
+                picker.show(function (rs) {
+                    //alert(rs.text)
+                    e.target.value= rs.text;
+                    picker.dispose();
+                });
+            })
+        })
+        
+        document.querySelector("#OrderSerch").addEventListener("tap", function () {
+            var objectData = new Object();
+            var userInfo = $.ActionFn.getPagesData("userInfo").RtnLoginList[0];
+            if (userInfo.DriType !== "" && userInfo.DriID !== "")
+            {
+                objectData.DriType = userInfo.DriType;
+                objectData.DriID = userInfo.DriID;
+                objectData.CardCode = "";
+            }
+            else
+            {
+                objectData.DriType = "";
+                objectData.DriID = "";
+                objectData.CardCode = userInfo.CardCode;
+            }
+            objectData.StartTime = document.querySelector("#StartTime").value;
+            objectData.EndTime = document.querySelector("#EndTime").value;
+            objectData.ShipperCode = document.querySelector("#OrderID").value;
+            $.ActionFn.sendData("GetMyMission", objectData, successCallBac)
+            function successCallBac(returnData) {
+                if (returnData.Rtn_Code == "0") {
+                    var dateBase = returnData.Content.RtnMyMissionLi;
+                    var n = dateBase.length;
+                    var thead = document.createElement("thead");
+                    thead.innerHTML = '<tr><th>运输单号</th><th>路线名称</th><th>发车时间</th><th>结束时间</th><th>状态</th></tr>';
+                    var tbody = document.createElement("tbody");
+                    for (var i = 0; i < n; i++)
+                    {
+                        var tr = document.createElement("tr");
+                        var rountName = dateBase[i].RouteName;
+                        if (rountName.length > 11)
+                        {
+
+                        }
+                        tr.innerHTML = "<td><span class = 'search-span'>" + dateBase[i].ShipperCode + "</span></td><td>" + dateBase[i].RouteName + "</td><td>" + dateBase[i].FactSendTime + "</td><td>" + dateBase[i].ReachDateTime + "</td><td>" + (dateBase[i].Billstates == "5" ? "已报销" : "未报销") + "</td>";
+                        tbody.appendChild(tr);
+                    }
+                    document.querySelector("#OrderTable").innerHTML = "";
+                    document.querySelector("#OrderTable").appendChild(thead);
+                    document.querySelector("#OrderTable").appendChild(tbody);
+                    var trList = document.querySelectorAll("#OrderTable tbody tr");
+                    var n = trList.length; 
+                    for (var i = 0; i < n; i++) {
+                        trList[i].addEventListener("tap", function (e) {
+                            $.ActionFn.setPagesData(e.currentTarget.childNodes[0].innerText);
+                            mui.openWindow({
+                                url: 'TaskDetails.html',
+                                id: 'TaskDetails',
+                                waiting: {
+                                    autoShow: true,//自动显示等待框，默认为true
+                                    title: '正在加载...',//等待对话框上显示的提示内容
+                                }
+                            })
+                        })
+                    }
+                }
+                else if (returnData.Rtn_Code == "1") {
+                    document.querySelector("#OrderTable").innerHTML = "";
+                    mui.toast('当前没有任务信息');
+                }
+                else if (returnData.Rtn_Code == "-1") {
+                    mui.alert(returnData.Rtn_Msg, '警告', function () {
+                    });
+                }
+            }
+        })
+    </script>
+</body>
+</html>

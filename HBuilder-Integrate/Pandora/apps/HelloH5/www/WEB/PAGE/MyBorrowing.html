@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Hello MUI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <!--标准mui.css-->
+    <script src="../../js/common.js"></script>
+    <link rel="stylesheet" href="../../css/common.css" />
+    
+    <link rel="stylesheet" type="text/css" href="../css/mui.min.css">
+    <script type="text/javascript" src="../js/mui.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="CSS_ext/Cssext1.css"/>
+    <!--时间选择控件-->
+	<link rel="stylesheet" type="text/css" href="../css/mui.picker.min.css" />
+	<script type="text/javascript" src="../PAGE/js/mui.picker.min.js"></script>
+	
+    <script type="text/javascript" src="js/jquery-2.1.4.min.js"></script>
+    <script type="text/javascript" src="../fnAction/FunctionAction.js"></script>
+    <script type="text/javascript" src="../fnAction/md5-min.js"></script> 
+    <style>
+        .title {
+            margin: 20px 15px 7px;
+            color: #6d6d72;
+            font-size: 15px;
+        }
+        .MyBorrowingTable tr td {   
+            width: 26%;
+            text-align: center;
+        } 
+        .MyBorrowingTable tr{
+        	height: 2em;
+        	border-top: 1px solid #F3F3F3;
+        }
+        .MainTitle {
+            width: 100%;
+            height: 2em;
+            line-height: 2em;
+        }
+    </style>
+    <script type="text/javascript">
+    	$(function(){
+            $('#MyBorrowingSerch').click(function(){
+	    		var userInfo=$.ActionFn.GetlocalStorage("userInfo");
+	    		var MyBorrowingobject = new Object();
+	            //借款人姓名
+	            MyBorrowingobject.DriName=userInfo.RtnLoginList[0].DriName;
+            	//借款单号
+            	if($('#OrderID').val()!='')
+            	{
+            		MyBorrowingobject.Number=$('#OrderID').val();
+            	}
+            	//借款时间判断
+            	if($('#MyBorrowingStartTime')[0].value!='')
+            	{
+            		if($('#MyBorrowingEndTime')[0].value!=''){
+            			MyBorrowingobject.StartTime=$('#MyBorrowingStartTime')[0].value;
+	            		MyBorrowingobject.EndTime=$('#MyBorrowingEndTime')[0].value;
+            		}
+            		else{
+            			mui.alert('请选择结束时间','警告',function(){})
+            		}
+            	}
+            	else if($('#MyBorrowingStartTime')[0].value==''&&$('#MyBorrowingEndTime')[0].value!='')
+            	{
+            		mui.alert('请选择开始时间','警告',function(){})
+            	}
+            	$.ActionFn.sendData("GetMyBorrowMoney", MyBorrowingobject, CallBackSuccess);
+            })
+    	}) 
+    	function CallBackSuccess(returndata){
+    		//清除Table
+    		$('#MyBorrowingtable tr').not($("#tbTitle")[0]).remove();
+        	if(returndata.Rtn_Code=='0'){
+        		if(returndata.Content!=null)
+        		{
+        			//借款金额  总计
+        			var BorrowaMountTotal=0;
+        			var MyBorrowLength=returndata.Content.RtnGetMyBorrowMoneyList.length;
+        			var VerifiState='';
+        			for(var i=0;i<MyBorrowLength;i++)
+        			{
+        				if(returndata.Content.RtnGetMyBorrowMoneyList[i].VerifiState=='1'){
+        					VerifiState='已归还';
+        				}
+        				else{
+        					VerifiState='未归还';
+        				}
+        				BorrowaMountTotal+=returndata.Content.RtnGetMyBorrowMoneyList[i].BorrowaMount;
+        				$('#MyBorrowingtable').append('<tr onclick= MyBorrowingClick(this)>'+
+                        '<td><span class=" mui-h6" style="color: #03A1F5;padding-left:10px">'+returndata.Content.RtnGetMyBorrowMoneyList[i].LoanBillCode+'</span></td>'+
+                        '<td><span class="mui-h6">'+returndata.Content.RtnGetMyBorrowMoneyList[i].BorrowPeriod.substring(0,returndata.Content.RtnGetMyBorrowMoneyList[i].BorrowPeriod.indexOf(' '))+'</span></td>'+
+                        '<td><span class="mui-h6">'+returndata.Content.RtnGetMyBorrowMoneyList[i].BorrowaMount+'</span></td>'+
+                        '<td><span class="mui-h6">'+VerifiState+'</span></td></tr>');
+        			}
+        			$('#MyBorrowingtable').append('<tr class="MyBorrowingTabletr">'+
+                        '<td><span class="mui-h6" style="color: red;;padding-left:10px">总计</span></td>'+
+                        '<td><span class="mui-h6"></span></td>'+
+                        '<td><span class="mui-h6" style="color: red;">'+BorrowaMountTotal+'</span></td>'+
+                        '<td><span class="mui-h6"></span></td></tr>');
+        		}
+        	}
+	        else if(returndata.Rtn_Code=='1'){
+	        	mui.toast('当前没有借款信息')
+	        }
+	        else if(returndata.Rtn_Code=='-1'){
+	        	mui.alert(returndata.Rtn_Msg,'警告',function(){})
+	        }
+      }
+    	function MyBorrowingClick(obj){
+    		var MyBorrowingLoanBillCode = $(obj).find('td:first').find('span').html();
+    		mui.openWindow({
+                url:'MyBorrowingDetail.html',
+                id: 'MyBorrowingDetail',
+                createNew:false,//是否重复创建同样id的webview，默认为false:不重复创建，直接显示
+                extras: {
+                	extData:MyBorrowingLoanBillCode,
+                },
+                waiting:{
+                	autoShow: true,
+                	title: '正在加载...', //等待对话框上显示的提示内容
+                },
+                show:{
+                	autoShow:true,//页面loaded事件发生后自动显示，默认为true
+					aniShow:"slide-in-right",//页面显示动画，默认为”“；
+					duration:200//页面动画持续时间，Android平台默认100毫秒，iOS平台默认200毫秒；
+                }
+            })
+    	}
+    </script>
+</head>
+<body>
+    <header class="mui-bar mui-bar-nav">
+        <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+        <h1  class="mui-title">我的借款</h1>
+    </header>
+    <div id="content" class="mui-content">
+        <ul class="mui-table-view">
+        	<li class="mui-input-row" style="padding: 11px 15px 3px 8px;">
+                <div style="float: left;line-height: 1.4em"><span style="color: #03A1F5;" class="mui-h5">借款时间：</span></div>
+                <div style="width: 73%;float: left;line-height: 2em;text-align: center;">
+                	<input type="text" id='MyBorrowingStartTime' data-options='{"type":"date","beginYear":2000,"endYear":2500}' class="btn mui-btn-block" style=" width:45%; height:2em; float:left;font-size: 11px;margin: 0;"/>
+                    <div style="float:left; width:10%; height:2em;">至</div>
+                    <input type="text" id='MyBorrowingEndTime' data-options='{"type":"date","beginYear":2000,"endYear":2500}' class="btn mui-btn-block" style=" width:45%; height:2em; float:right;font-size: 11px;margin: 0;"/>
+                </div>
+            </li>
+            <li class="mui-input-row"  style="padding: 11px 15px 0 8px;">
+                <div class="MainTitle">
+                    <div style="line-height: 1.5em;float: left;"><span style="color: #03A1F5;" class="mui-h5">借款单号：</span></div>
+                    <div style="width: 73%;float: left;height: 2em;">
+                        <input type="text" id="OrderID" style="width: 60%;height:  1.6em;float: left;margin: 0;">
+                        <button id="MyBorrowingSerch" class="mui-btn mui-btn-block btn-color" style="width: 35%;border-radius: 6px;height: 2em;float: right;background-color: #03A2F5;color:white;margin-left: 0.5em;margin: 0;padding: 0;font-size: 14px;">查找</button>
+                    </div>
+                </div>
+            </li>
+            
+        </ul>
+        <div style="padding-top: 10px;">
+	        <ul class="mui-table-view">
+	            <li>
+	                <table id='MyBorrowingtable' class="MyBorrowingTable" style="width: 100%;">
+	                    <tr id="tbTitle">
+	                        <td><span class="mui-h6" style="color: #03A1F5;;padding-left:10px">借款单号</span></td>
+	                        <td><span class="mui-h6" style="color: #03A1F5;">借款时间</span></td>
+	                        <td><span class="mui-h6" style="color: #03A1F5;">金&nbsp;&nbsp;额</span></td>
+	                        <td><span class="mui-h6" style="color: #03A1F5;">归还状态</span></td>
+	                    </tr>
+	                </table>
+	            </li>
+	        </ul>
+        </div>
+    </div>
+    <script>
+    	 mui.init({
+            //下拉刷新、上拉加载
+            pullRefresh: {
+                //...
+            },
+            //手势配置
+            gestureConfig: {
+                //...
+            },
+            //侧滑关闭
+            swipeBack: true, //Boolean(默认false)启用右滑关闭功能
+
+            //监听Android手机的back、menu按键
+            keyEventBind: {
+                backbutton: false,  //Boolean(默认true)关闭back按键监听
+                menubutton: false   //Boolean(默认true)关闭menu按键监听
+            },
+            //处理窗口关闭前的业务
+            beforeback: function () {
+                //... //窗口关闭前处理其他业务详情点击 ↑ "关闭页面"链接查看
+            },
+            preloadLimit: 1//预加载窗口数量限制(一旦超出,先进先出)默认不限制
+       });
+		(function($) {
+			$.init();
+			var MyBorrowingStartTimeClick = $('#MyBorrowingStartTime');
+			var MyBorrowingEndTimeClick = $('#MyBorrowingEndTime');
+			MyBorrowingStartTimeClick.each(function(i, btn) {
+				btn.addEventListener('tap', function() {
+					var optionsJson = this.getAttribute('data-options') || '{}';
+					var options = JSON.parse(optionsJson);
+					var id = this.getAttribute('id');
+					/*
+					* 首次显示时实例化组件
+					* 示例为了简洁，将 options 放在了按钮的 dom 上
+					* 也可以直接通过代码声明 optinos 用于实例化 DtPicker
+					*/
+					var picker = new $.DtPicker(options);
+					picker.show(function(rs) {
+						/*
+						 * rs.value 拼合后的 value
+						 * rs.text 拼合后的 text
+						 * rs.y 年，可以通过 rs.y.vaue 和 rs.y.text 获取值和文本
+						 * rs.m 月，用法同年
+						 * rs.d 日，用法同年
+						 * rs.h 时，用法同年
+						 * rs.i 分（minutes 的第二个字母），用法同年
+						*/
+						if($('#MyBorrowingEndTime')[0].value!='')
+						{
+							if(rs.text<=$('#MyBorrowingEndTime')[0].value)
+							{
+								$('#MyBorrowingStartTime')[0].value=rs.text;
+							}
+							else{
+								 mui.alert('开始时间不能大于结束时间', '警告', function () {});
+							}
+						}
+						else{
+							$('#MyBorrowingStartTime')[0].value=rs.text;
+						}
+						/* 
+						 * 返回 false 可以阻止选择框的关闭
+						 * return false;
+						 */
+						/*
+						 * 释放组件资源，释放后将将不能再操作组件
+						 * 通常情况下，不需要示放组件，new DtPicker(options) 后，可以一直使用。
+						 * 当前示例，因为内容较多，如不进行资原释放，在某些设备上会较慢。
+						 * 所以每次用完便立即调用 dispose 进行释放，下次用时再创建新实例。
+						 */
+						picker.dispose();
+					});
+				}, false);
+			});
+			MyBorrowingEndTimeClick.each(function(i, btn) {
+				btn.addEventListener('tap', function() {
+					var optionsJson = this.getAttribute('data-options') || '{}';
+					var options = JSON.parse(optionsJson);
+					var id = this.getAttribute('id');
+					var picker = new $.DtPicker(options);
+					picker.show(function(rs) {
+						if($('#MyBorrowingStartTime')[0].value!='')
+						{
+							if(rs.text>=$('#MyBorrowingStartTime')[0].value)
+							{
+								$('#MyBorrowingEndTime')[0].value=rs.text;
+							}
+							else{
+								 mui.alert('结束时间不能小于开始时间', '警告', function () {});
+							}
+						}
+						else{
+							$('#MyBorrowingEndTime')[0].value=rs.text;
+						}
+						picker.dispose();
+					});
+				}, false); 
+			});
+		})(mui);
+	</script>
+</body>
+</html>

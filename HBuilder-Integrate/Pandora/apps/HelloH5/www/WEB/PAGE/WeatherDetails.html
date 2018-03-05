@@ -1,0 +1,132 @@
+﻿<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<title>天气详情</title>
+		<!--标准mui.css-->
+		<link rel="stylesheet" href="css/mui.min.css">
+		<script src="../js/mui.min.js"></script>
+		<script src="js/jquery-2.1.4.min.js"></script>
+		<script src="../fnAction/md5-min.js"></script>
+		<script src="../fnAction/FunctionAction.js"></script>
+		<link href="CSS_ext/Cssext1.css" rel="stylesheet" />
+		<script type="text/javascript">
+		</script>
+		<style>
+			.title {
+				margin: 20px 15px 10px;
+				color: #03a2f5;
+				font-size: 15px;
+			}
+			
+			.img-after {
+				width: 20px;
+				height: 20px;
+				vertical-align: middle;
+				margin-left: 10px;
+			}
+			
+			.span-img-after {
+				padding: 11px 65px 11px 15px;
+			}
+			
+			#luyou tr {
+				height: 80px;
+				font-size: 1em;
+			}
+			
+			#luyou td {
+				border-bottom: solid 1px #C8C7CC;
+			}
+			
+			.wd {
+				position: relative;
+				top: -18px;
+			}
+			
+			.wicon {
+				width: 45px;
+				height: 45px;
+				border-radius: 100px;
+				vertical-align: super;
+			}
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">天气详情</h1>
+		</header>
+		<div class="mui-content">
+
+			<div class="mui-card" style="margin-bottom: 35px;">
+				<div class="mui-card-header">
+					<h4></h4></div>
+
+				<div class="mui-card-content">
+					<table style="width:100%" id="luyou" cellpadding="0" cellspacing="0">
+					</table>
+				</div>
+			</div>
+		</div>
+		<script>
+			mui.plusReady(function() {
+				plus.webview.currentWebview().setStyle({
+					scrollIndicator: 'none'
+				});
+			})
+			mui.init({
+				//下拉刷新、上拉加载
+				pullRefresh: {
+					//...
+				},
+				//手势配置
+				gestureConfig: {
+					//...
+				},
+				//侧滑关闭
+				swipeBack: true, //Boolean(默认false)启用右滑关闭功能
+
+				//监听Android手机的back、menu按键
+				keyEventBind: {
+					backbutton: true, //Boolean(默认true)关闭back按键监听
+					menubutton: false //Boolean(默认true)关闭menu按键监听
+				},
+				//处理窗口关闭前的业务
+				beforeback: function() {
+					//... //窗口关闭前处理其他业务详情点击 ↑ "关闭页面"链接查看
+				}
+			})
+			window.addEventListener("preAct", function() {
+				var extdata = event.detail.extdata;
+				var obj = new Object();
+				obj.cityName = extdata;
+				$.ActionFn.sendData("GetWeatherMsgByCity", obj, WetherSuccess);
+			})
+
+			function WetherSuccess(msg) {
+				var we = msg.Content.RtnWeatherMsgByCityLi[0].WeatherResult;
+				var w = JSON.parse(we);
+				var wjson = w.results[0].weather_data;
+				$(".mui-card-header").text(wjson[0].date);
+				$("#luyou").html("");
+				for(var i = 1; i < wjson.length; i++) {
+					if(i == 1) {
+						$("#luyou").append('<tr><td style="background-image: url(../Images/Index/first.png); background-repeat:no-repeat;border-bottom:0px; background-position:center;width:40px"></td><td><span class="addressname">' + wjson[i].date + '</span><br /></td><td><span class="wd">(' + wjson[i].temperature + ') </span><img class="wicon" src="' + wjson[i].dayPictureUrl + '" /></td><td>' + wjson[i].weather + '</td></tr>');
+					} else if(i == wjson.length - 1) {
+						$("#luyou").append('<tr><td style="background-image: url(../Images/Index/last.png); background-repeat:no-repeat;border-bottom:0px; background-position:center;width:40px"></td><td><span class="addressname">' + wjson[i].date + '</span><br /></td><td><span class="wd">(' + wjson[i].temperature + ') </span><img class="wicon" src="' + wjson[i].dayPictureUrl + '" /></td><td>' + wjson[i].weather + '</td></tr>');
+
+					} else {
+						$("#luyou").append('<tr><td style="background-image: url(../Images/Index/center.png); background-repeat:no-repeat;border-bottom:0px; background-position:center;width:40px"></td><td><span class="addressname">' + wjson[i].date + '</span><br /></td><td><span class="wd">(' + wjson[i].temperature + ') </span><img class="wicon" src="' + wjson[i].dayPictureUrl + '" /></td><td>' + wjson[i].weather + '</td></tr>');
+					}
+				}
+			}
+		</script>
+	</body>
+
+</html>

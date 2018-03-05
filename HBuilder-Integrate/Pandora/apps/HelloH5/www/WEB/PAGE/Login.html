@@ -1,0 +1,143 @@
+﻿<!DOCTYPE html>
+<html class="ui-page-login">
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title></title>
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<script src="js/mui.min.js"></script>
+		<link href="css/mui.imageviewer.css" rel="stylesheet" />
+		<script src="../fnAction/jquery-2.1.4.min.js"></script>
+		<script src="../fnAction/FunctionAction.js"></script>
+		<script src="../fnAction/md5-min.js"></script>
+		<style>
+			.mui-content {
+				text-align: center;
+				background-color: white;
+			}
+			
+			html {
+				background-color: white;
+			}
+			
+			.mui-btn-block {
+				padding: 7px 0;
+			}
+			
+			#content {
+				padding-top: 50px;
+			}
+			
+			#img-header {
+				padding-top: 30px;
+			}
+			
+			.mui-content-padded {
+				padding-top: 20px;
+			}
+			
+			.btn-color {
+				background-color: #03a2f5;
+				color: white;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="mui-content">
+			<div id="img-header">
+				<img src="IMG_ext/Login/UnitLogo.png" />
+			</div>
+			<!-- 账号密码-->
+			<div id="content">
+				<form id='login-form' class="mui-input-group">
+					<div class="mui-input-row">
+						<label>账号</label>
+						<input id='account' type="text" class="mui-input-clear mui-input" placeholder="请输入账号">
+					</div>
+					<div class="mui-input-row">
+						<label>密码</label>
+						<input id='password' type="password" class="mui-input-clear mui-input" placeholder="请输入密码">
+					</div>
+				</form>
+			</div>
+			<div class="mui-content-padded">
+				<button id="login" class="mui-btn mui-btn-block btn-color">登录</button>
+				<button id="exit" class="mui-btn mui-btn-block btn-color">注册</button>
+			</div>
+		</div>
+		<script>
+		mui.plusReady(function() {
+				plus.webview.currentWebview().setStyle({
+					scrollIndicator: 'none'
+				});
+			});
+			mui.init({
+				//下拉刷新、上拉加载
+				pullRefresh: {
+					//...
+				},
+				//手势配置
+				gestureConfig: {
+					//...
+				},
+				//侧滑关闭
+				swipeBack: true, //Boolean(默认false)启用右滑关闭功能
+
+				//监听Android手机的back、menu按键
+				keyEventBind: {
+					backbutton: true, //Boolean(默认true)关闭back按键监听
+					menubutton: false //Boolean(默认true)关闭menu按键监听
+				},
+				//处理窗口关闭前的业务
+				beforeback: function() {
+					//... //窗口关闭前处理其他业务详情点击 ↑ "关闭页面"链接查看
+				},
+				preloadPages: [{
+						url: 'Index.html',
+						id: 'Index'
+					}]
+				
+			})
+
+			var launchFlag = $.ActionFn.GetlocalStorage("launchFlag");
+			if(launchFlag == "1") {
+				var launchData = $.ActionFn.GetlocalStorage("launchData");
+				document.querySelector("#account").value = launchData.UserName;
+				document.querySelector("#password").value = launchData.PassWord;
+			}
+			var btn = document.getElementById("login");
+			btn.addEventListener("tap", function() {
+				//$.fn.nativeGetRegistrationID();
+				var objectData = new Object();
+				objectData.UserName = document.querySelector("#account").value;
+				objectData.PassWord = document.querySelector("#password").value;
+				objectData.channelidX = 1;
+				objectData.useridX = 1;
+				objectData.PhoneType = 1;
+				$.ActionFn.sendData("RequestLogIn", objectData, successCallBac)
+				function successCallBac(returnData) {
+					if(returnData.Rtn_Code == "0") {
+						$.ActionFn.SetlocalStorage("launchFlag", "1");
+						$.ActionFn.SetlocalStorage("launchData", objectData);
+						$.ActionFn.SetlocalStorage("userInfo", returnData.Content);
+						//$.ActionFn.selfFireFunction("Index","preAct","");
+						$.ActionFn.selfOpenWindow("Index","Index.html");
+					} else if(returnData.Rtn_Code == "-1") {
+						mui.alert(returnData.Rtn_Msg, '警告', function() {});
+					}
+				}
+			});
+			var exitbtn = document.getElementById("exit");
+			exitbtn.addEventListener("click", function() {
+				mui.openWindow({
+					url: 'Register.html',
+					id: 'Register',
+					createNew: false, //是否重复创建同样id的webview，默认为false:不重复创建，直接显示
+				})
+			});
+		</script>
+	</body>
+
+</html>

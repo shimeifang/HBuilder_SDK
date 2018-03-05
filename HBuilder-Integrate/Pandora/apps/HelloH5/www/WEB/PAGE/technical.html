@@ -1,0 +1,77 @@
+﻿<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Hello MUI</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<!--标准mui.css-->
+		<link rel="stylesheet" href="css/mui.min.css">
+        <link href="CSS_ext/Cssext1.css" rel="stylesheet" />
+		<!--设置导航栏状态颜色-->
+
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+            <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">技术支持</h1>
+		</header>
+		<div class="mui-content">
+            <div class="mui-card">
+                <div class="mui-card-header">内部技术支持</div>
+                <div class="mui-card-content">
+                    <div class="mui-card-content-inner">
+                        <div class="mui-media-body">
+                            <p class='mui-ellipsis mui-h4'>姓名:王五</p>
+                            <p class='mui-ellipsis mui-h4'>电话:11000000000</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mui-card">
+                <div class="mui-card-header">外部技术支持</div>
+                <div class="mui-card-content">
+                    <div class="mui-card-content-inner">
+                        <div class="mui-media-body">
+                            <p class='mui-ellipsis mui-h4'>姓名:闫贵臣</p>
+                            <p class='mui-ellipsis mui-h4'>电话:18721011178</p>
+                            <p class='mui-ellipsis mui-h4'>QQ:254073327</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+		</div>
+        <script src="js/mui.min.js"></script>
+        <script>
+            mui.plusReady(function () {
+                console.log("当前页面URL：" + plus.webview.currentWebview().getURL());
+            });
+            mui.init({
+                //下拉刷新、上拉加载
+                pullRefresh: {
+                    //...
+                },
+                //手势配置
+                gestureConfig: {
+                    //... 
+                },
+                //侧滑关闭
+                swipeBack: true, //Boolean(默认false)启用右滑关闭功能
+
+                //监听Android手机的back、menu按键
+                keyEventBind: {
+                    backbutton: false,  //Boolean(默认true)关闭back按键监听
+                    menubutton: false   //Boolean(默认true)关闭menu按键监听
+                },
+                //处理窗口关闭前的业务
+                beforeback: function () {
+                    //... //窗口关闭前处理其他业务详情点击 ↑ "关闭页面"链接查看
+                },
+                preloadLimit: 1//预加载窗口数量限制(一旦超出,先进先出)默认不限制
+            })
+        </script>
+	</body>
+
+</html>

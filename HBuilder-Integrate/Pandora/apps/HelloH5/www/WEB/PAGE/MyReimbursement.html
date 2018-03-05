@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>我的报销</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<!--标准mui.js-->
+		<script src="../../js/common.js"></script>
+    	<link rel="stylesheet" href="../../css/common.css" />
+		<script type="text/javascript" src="js/jquery-2.1.4.min.js"></script>
+		<script type="text/javascript" src="../js/mui.min.js"></script>
+		<script type="text/javascript" src="../fnAction/FunctionAction.js"></script>
+		<script type="text/javascript" src="../fnAction/md5-min.js"></script>
+		<!--标准mui.css-->
+		<link rel="stylesheet" href="../css/mui.min.css">
+		<link rel="stylesheet" type="text/css" href="CSS_ext/Cssext1.css" />
+		<!--时间选择控件-->
+		<link rel="stylesheet" type="text/css" href="../css/mui.picker.min.css" />
+		<script type="text/javascript" src="../PAGE/js/mui.picker.min.js"></script>
+		<!--下拉框选择控件-->
+		<link rel="stylesheet" type="text/css" href="../PAGE/css/mui.poppicker.css" />
+		<script type="text/javascript" src="../PAGE/js/mui.poppicker.js"></script>
+		<style>
+
+			.MyReimbursementTable tr {
+				height: 2em;
+				border-top: 1px solid #F3F3F3;
+			}
+			
+			.MyReimbursementTable tr td {
+				width: 25%;
+				text-align: center;
+			}
+		</style>
+		<script type="text/javascript">
+			$(function() {
+				$('#MyReimburseOrderSerch').click(function() {
+					//获取保存在Session中的值
+					var userInfo = $.ActionFn.GetlocalStorage("userInfo");
+					var MyReimburseobject = new Object();
+					MyReimburseobject.ReimburseUserName = userInfo.RtnLoginList[0].DriName;
+					//运输单号
+					if($('#MyReimburseOrderID').val() != '') {
+						MyReimburseobject.ReimbursementCode = $('#MyReimburseOrderID').val();
+					}
+					//状态
+					MyReimburseobject.ReimburseState = $('#showUserPicker').val()
+						//发车时间判断
+					if($('#MyReimbursementStartTime')[0].value != '') {
+						if($('#MyReimbursementEndTime')[0].value != '') {
+							MyReimburseobject.StartTime = $('#MyReimbursementStartTime')[0].value;
+							MyReimburseobject.EndTime = $('#MyReimbursementEndTime')[0].value;
+						} else {
+							mui.alert('请选择结束时间', '警告', function() {})
+						}
+					} else if($('#MyReimbursementStartTime')[0].value == '' && $('#MyReimbursementEndTime')[0].value != '') {
+						mui.alert('请选择开始时间', '警告', function() {})
+					}
+					$.ActionFn.sendData("GetMyReimbursement", MyReimburseobject, CallBackSuccess)
+				})
+			});
+
+			function CallBackSuccess(returndata) {
+				$('.MyReimbursementTabletr').remove();
+				if(returndata.Rtn_Code == '0') {
+					if(returndata.Content != null) {
+						var MyReimburseLength = returndata.Content.RtnMyReimbursementList.length;
+						var ReimburseType = '';
+						for(var i = 0; i < MyReimburseLength; i++) {
+							$('#MyReimbursementTable').append('<tr class="MyReimbursementTabletr">' +
+								'<td><span class="mui-h6" style="color: #03A1F5;">' + returndata.Content.RtnMyReimbursementList[i].ReimbursementCode + '</span></td>' +
+								'<td><span class="mui-h6">' + returndata.Content.RtnMyReimbursementList[i].ReimburseTypeStr + '</span></td>' +
+								'<td><span class="mui-h6">' + returndata.Content.RtnMyReimbursementList[i].ReimburseCost + '</span></td>' +
+								'<td><span class="mui-h6">' + returndata.Content.RtnMyReimbursementList[i].ReimburseDate + '</span></td></tr>');
+						}
+					}
+				} else if(returndata.Rtn_Code == '1') {
+					mui.toast('当前没有报销信息')
+				} else if(returndata.Rtn_Code == '-1') {
+					mui.alert(returndata.Rtn_Msg, '警告', function() {})
+				}
+			}
+		</script>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav" >
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1  class="mui-title">我的报销</h1>
+		</header>
+		<div id="content" class="mui-content">
+			<ul class="mui-table-view">
+				
+				
+				
+				
+				<li class="mui-input-row" style="padding: 11px 15px 3px 8px">
+					<div style="float: left;line-height: 1.4em;"><span style="color: #03A1F5;" class="mui-h5">发车时间：</span></div>
+					<div style="width: 73%;float: left;line-height: 1.4em;text-align: center;">
+						<input type="text" id='MyReimbursementStartTime' data-options='{"type":"date","beginYear":2000,"endYear":2500}' class="btn mui-btn-block" style=" width:45%; height:2.5em; float:left;font-size: 11px;margin: 0;" />
+						<div style="float:left; width:10%;">至</div>
+						<input type="text" id='MyReimbursementEndTime' data-options='{"type":"date","beginYear":2000,"endYear":2500}' class="btn mui-btn-block" style=" width:45%; height:2.5em; float:right;font-size: 11px;margin: 0;" />
+					</div>
+					<!--<div align="center">
+						<input id='showUserPicker' type="button" class="mui-btn mui-btn-block" style="width: 95%;border:1px solid rgba(0,0,0,.2);border-radius: 6px;height: 2.5em;margin: 1em 0;float: none;" name="0" value="全部" />
+					</div>-->
+				</li>
+				
+				<li class="mui-input-row" style="padding: 11px 15px 0 8px;">
+					<div class="MainTitle">
+						<div style="line-height: 1.5em;float: left;"><span style="color: #03A1F5;" class="mui-h5">运输单号：</span></div>
+						<div style="width: 76%;float: left;height: 2em;">
+							<input type="text" id="MyReimburseOrderID" style="width: 95%;height: 1.6em;float: left;margin: 0;">
+							<!--<input id="MyReimburseOrderSerch" type="button" style="width: 35%;border-radius: 6px;float: right;height: 2em;background-color: #03A2F5;color:white;margin-left: 0.5em;" value="查找" />-->
+							<!--<button id="MyReimburseOrderSerch" class="mui-btn mui-btn-block btn-color" style="width: 35%;border-radius: 6px;height: 2em;float: right;background-color: #03A2F5;color:white;margin-left: 0.5em;margin: 0;padding: 0;font-size: 14px;">查找</button>-->
+						</div>
+					</div>
+				</li>
+				
+				<li class="mui-input-row" style="padding: 11px 15px 10px 8px;">
+					<div >
+						<div style="line-height: 1.5em;float: left;"><span style="color: #03A1F5;" class="mui-h5">报销类型：</span>
+						</div>
+						<div class="mui-select" style="width: 40%;float: left;height: 1.6em;border: 1px solid gainsboro;display: inline-block;border-radius: 5px;margin-left: 0.1em;">
+						   <select style="width: 100%;height: 1.4em;padding-left: 1.4em;font-size: 14px;">
+                               <option value="0" selected="selected">全部</option>
+                               <option value="1" >未审批</option>
+                               <option value="2" >审批中</option>
+                               <option value="3" >审批完成</option>
+                               <option value="4" >支付中</option>
+                               <option value="5" >支付完成</option>
+          
+							</select>	
+						</div>
+						<button  class="mui-btn mui-btn-block btn-color" style="width: 20%;border-radius: 6px;height: 2em;float: left;background-color: #03A2F5;color:white;margin-left: 2em;padding: 0;font-size: 14px;">
+							查找
+						</button>
+					</div>
+				</li>
+				
+			</ul>
+			<div style="padding-top: 10px">
+				<ul class="mui-table-view">
+					<li>
+						<table id='MyReimbursementTable' class="MyReimbursementTable" style="width: 100%;color: #03A1F5;">
+							<tr>
+								<td>申请单号</td>
+								<td>类&nbsp;&nbsp;型</td>
+								<td>金&nbsp;&nbsp;额</td>
+								<td>时&nbsp;&nbsp;间</td>
+							</tr>
+						</table>
+					</li>
+				</ul>
+			</div>
+		</div>
+		<script>
+		mui.plusReady(function() {
+				plus.webview.currentWebview().setStyle({
+					scrollIndicator: 'none'
+				});
+			});
+			(function($, doc) {
+				$.init({
+					//下拉刷新、上拉加载
+					pullRefresh: {
+						//...
+					},
+					//手势配置
+					gestureConfig: {
+						//...
+					},
+					//侧滑关闭
+					swipeBack: true, //Boolean(默认false)启用右滑关闭功能
+
+					//监听Android手机的back、menu按键
+					keyEventBind: {
+						backbutton: true, //Boolean(默认true)关闭back按键监听
+						menubutton: false //Boolean(默认true)关闭menu按键监听
+					},
+					//处理窗口关闭前的业务
+					beforeback: function() {
+						//... //窗口关闭前处理其他业务详情点击 ↑ "关闭页面"链接查看
+					},
+					preloadLimit: 1 //预加载窗口数量限制(一旦超出,先进先出)默认不限制
+				});
+				//下拉框选择控件
+				$.ready(function() {
+					//普通示例
+					var userPicker = new $.PopPicker();
+                        
+					userPicker.setData([{
+						value: '0',
+						text: '全部'
+					}, {
+						value: '1',
+						text: '未审批'
+					}, {
+						value: '2',
+						text: '审批中'
+					}, {
+						value: '3',
+						text: '审批完成'
+					}, {
+						value: '4',
+						text: '支付中'
+					}, {
+						value: '5',
+						text: '支付完成'
+					}]);
+					var showUserPickerButton = doc.getElementById('showUserPicker');
+					showUserPickerButton.addEventListener('tap', function(event) {
+						userPicker.show(function(items) {
+							showUserPickerButton.value = items[0].text;
+							showUserPickerButton.name = items[0].value;
+							//返回 false 可以阻止选择框的关闭
+							//return false;
+						});
+					}, false);
+				});
+				//时间选择控件
+				var result = $('#result')[0];
+				var MyReimbursementStartTimeClick = $('#MyReimbursementStartTime');
+				var MyReimbursementEndTimeClick = $('#MyReimbursementEndTime');
+				MyReimbursementStartTimeClick.each(function(i, btn) {
+					btn.addEventListener('tap', function() {
+						var optionsJson = this.getAttribute('data-options') || '{}';
+						var options = JSON.parse(optionsJson);
+						var id = this.getAttribute('id');
+						/*
+						 * 首次显示时实例化组件
+						 * 示例为了简洁，将 options 放在了按钮的 dom 上
+						 * 也可以直接通过代码声明 optinos 用于实例化 DtPicker mui-btn
+						 */
+						var picker = new $.DtPicker(options);
+						picker.show(function(rs) {
+							/*
+							 * rs.value 拼合后的 value
+							 * rs.text 拼合后的 text
+							 * rs.y 年，可以通过 rs.y.vaue 和 rs.y.text 获取值和文本
+							 * rs.m 月，用法同年
+							 * rs.d 日，用法同年
+							 * rs.h 时，用法同年
+							 * rs.i 分（minutes 的第二个字母），用法同年
+							 */
+							if($('#MyReimbursementEndTime')[0].value != '') {
+								if(rs.text <= $('#MyReimbursementEndTime')[0].value) {
+									$('#MyReimbursementStartTime')[0].value = rs.text;
+								} else {
+									mui.alert('开始时间不能大于结束时间', '警告', function() {});
+								}
+							} else {
+								$('#MyReimbursementStartTime')[0].value = rs.text;
+							}
+							/* 
+							 * 返回 false 可以阻止选择框的关闭
+							 * return false;
+							 */
+							/*
+							 * 释放组件资源，释放后将将不能再操作组件
+							 * 通常情况下，不需要示放组件，new DtPicker(options) 后，可以一直使用。
+							 * 当前示例，因为内容较多，如不进行资原释放，在某些设备上会较慢。
+							 * 所以每次用完便立即调用 dispose 进行释放，下次用时再创建新实例。
+							 */
+							picker.dispose();
+						});
+					}, false);
+				});
+				MyReimbursementEndTimeClick.each(function(i, btn) {
+					btn.addEventListener('tap', function() {
+						var optionsJson = this.getAttribute('data-options') || '{}';
+						var options = JSON.parse(optionsJson);
+						var id = this.getAttribute('id');
+						/*
+						 * 首次显示时实例化组件
+						 * 示例为了简洁，将 options 放在了按钮的 dom 上
+						 * 也可以直接通过代码声明 optinos 用于实例化 DtPicker
+						 */
+						var picker = new $.DtPicker(options);
+						picker.show(function(rs) {
+							/*
+							 * rs.value 拼合后的 value
+							 * rs.text 拼合后的 text
+							 * rs.y 年，可以通过 rs.y.vaue 和 rs.y.text 获取值和文本
+							 * rs.m 月，用法同年
+							 * rs.d 日，用法同年
+							 * rs.h 时，用法同年
+							 * rs.i 分（minutes 的第二个字母），用法同年
+							 */
+							if($('#MyReimbursementStartTime')[0].value != '') {
+								if(rs.text >= $('#MyReimbursementStartTime')[0].value) {
+									$('#MyReimbursementEndTime')[0].value = rs.text;
+								} else {
+									mui.alert('结束时间不能小于开始时间', '警告', function() {});
+								}
+							} else {
+								$('#MyReimbursementEndTime')[0].value = rs.text;
+							}
+							/* 
+							 * 返回 false 可以阻止选择框的关闭
+							 * return false;
+							 */
+							/*
+							 * 释放组件资源，释放后将将不能再操作组件
+							 * 通常情况下，不需要示放组件，new DtPicker(options) 后，可以一直使用。
+							 * 当前示例，因为内容较多，如不进行资原释放，在某些设备上会较慢。
+							 * 所以每次用完便立即调用 dispose 进行释放，下次用时再创建新实例。
+							 */
+							picker.dispose();
+						});
+					}, false);
+				});
+			})(mui, document);
+		</script>
+	</body>
+
+</html>

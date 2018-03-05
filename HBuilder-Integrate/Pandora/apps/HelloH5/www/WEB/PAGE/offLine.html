@@ -1,0 +1,158 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Hello MUI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <!--标准mui.css-->
+    <script src="../../js/common.js"></script>
+    <link rel="stylesheet" href="../../css/common.css" />
+    <link rel="stylesheet" href="css/mui.min.css">
+    <link href="CSS_ext/Cssext1.css" rel="stylesheet" />
+    <script src="../fnAction/jquery-2.1.4.min.js"></script>
+    <script src="../fnAction/FunctionAction.js"></script>
+    <script src="../fnAction/md5-min.js"></script>
+    <style>
+        .btn_modify {
+            padding: 3px 6px;
+        }
+        .mui-table-modify {
+            padding: 11px 6px;
+            background-color:white;
+            border-bottom:1px solid #eee;
+        }
+        .updatebtn {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="mui-bar mui-bar-nav">
+        <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+        <h1 class="mui-title">离线任务</h1>
+    </header>
+    <div id="content" class="mui-content">
+            <ul class="mui-table-view">
+                <li class="mui-table-view-cell table-title mui-table-modify">
+                    <div class="mui-grid-view mui-row ">
+                        <div class="mui-col-xs-4"><span class="mui-h5">任务模块</span></div>
+                        <div class="mui-col-xs-4"><span class="mui-h5">描述</span></div>
+                        <div class="mui-col-xs-4"><span class="mui-h5">操作</span></div>
+                    </div>
+                </li>
+            </ul>
+        <form id="offLineContent">
+            
+            <!--<div class="mui-grid-view mui-row mui-table-modify ">
+                <div class="mui-col-xs-4"><span class="mui-h6">我的任务</span></div>
+                <div class="mui-col-xs-4" style="line-height:1em"><span class="mui-h6">中山中心站点做发车操作2</span></div>
+                <div class="mui-col-xs-4 ">
+                    <button type="button" class="mui-btn mui-btn-primary btn_modify">
+                        上传
+                    </button>
+                    <button type="button" class="mui-btn mui-btn-primary btn_modify">
+                        取消
+                    </button>
+                </div>
+            </div>-->
+        </form>
+        <script src="../js/mui.min.js"></script>
+        <script>
+            mui.init({
+                //下拉刷新、上拉加载
+                pullRefresh: {
+                    //...
+                },
+                //手势配置
+                gestureConfig: {
+                    //...
+                },
+                //侧滑关闭
+                swipeBack: true, //Boolean(默认false)启用右滑关闭功能
+
+                //监听Android手机的back、menu按键
+                keyEventBind: {
+                    backbutton: true,  //Boolean(默认true)关闭back按键监听
+                    menubutton: false   //Boolean(默认true)关闭menu按键监听
+                },
+                //处理窗口关闭前的业务
+                beforeback: function () {
+                  $.ActionFn.selfFireFunction("Index","preAct","");
+                }
+            })
+            var userInfo = $.ActionFn.GetlocalStorage("userInfo");
+            var offLineContent = $.ActionFn.GetlocalStorage("offline" + userInfo.RtnLoginList[0].ID);
+            if (offLineContent != null) {
+                offLineContent = JSON.parse(offLineContent);
+                var n = offLineContent.length;
+                var content = document.querySelector("#offLineContent");
+                for (var i = 0; i < n; i++) {
+                    var node = document.createElement("div");
+                    node.classList.add("mui-grid-view");
+                    node.classList.add("mui-row");
+                    node.classList.add("mui-table-modify");
+                    node.innerHTML = '<div class="mui-col-xs-4"><span class="mui-h6">我的任务</span></div><div class="mui-col-xs-4" style="line-height:1em"><span class="mui-h6">' + offLineContent[i].OperateContent + '</span></div><div class="mui-col-xs-4 "><button type="button" code=' + offLineContent[i].shipperCode + ' class="mui-btn mui-btn-primary btn_modify updatebtn">上传</button><button type="button" code=' + offLineContent[i].shipperCode + ' class="mui-btn mui-btn-primary btn_modify canelbtn">取消</button></div>';
+                    content.appendChild(node);
+                }
+                var btnList = document.querySelectorAll(".updatebtn");
+                var nk = btnList.length;
+
+                for (var j = 0 ; j < nk; j++) {
+                    var index = -1;
+                    btnList[j].addEventListener("tap", function (e) {
+                        var code = e.target.getAttribute('code');
+                        for (var k = 0; k < n; k++) {
+                            if (code == offLineContent[k].shipperCode) {
+                                index = k;
+                                break;
+                            }
+                        }
+                        if (index != -1) {
+                            var objectData = offLineContent[index].Content;
+                            var actionStr = "";
+                            if (offLineContent[index].OperateType == 0)//发车
+                            {
+                                actionStr = "SendAndArriveBySend";
+                            }
+                            else if (offLineContent[index].OperateType == 1) {
+                                actionStr = "SendAndArriveByArrive";
+                            }
+                            $.ActionFn.sendData(actionStr, objectData, successCallBac);
+                            function successCallBac(returnData) {
+                                if (returnData.Rtn_Code == 0) {
+                                    Del(code, e);
+                                }
+                            }
+                        }
+                    })
+                    btnList[j].nextElementSibling.addEventListener("tap", function (e) {
+                        var code = e.target.getAttribute('code');
+                        Del(code,e);
+                    })
+
+                }
+            }
+            else {
+                
+            }
+            function Del(_code,e)
+            {
+                var offLinelist = $.ActionFn.GetlocalStorage("offline" + userInfo.RtnLoginList[0].ID);
+                offLinelist = JSON.parse(offLinelist);
+                for (var i in offLinelist) {
+                    if (offLinelist[i].shipperCode == _code) {
+                        offLinelist.splice(i, 1);
+                        break
+                    }
+                }
+                //Msglist.splice(_index,1);
+                $.ActionFn.SetlocalStorage("offline" + userInfo.RtnLoginList[0].ID, offLinelist);
+                e.target.parentNode.parentNode.style.display = 'none';
+            }
+        </script>
+    </div>
+</body>
+</html>

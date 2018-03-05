@@ -1,0 +1,197 @@
+﻿<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<title>任务详情</title>
+		<!--标准mui.css-->
+		<link rel="stylesheet" href="css/mui.min.css">
+		<script src="js/mui.min.js"></script>
+		<script src="../fnAction/jquery-2.1.4.min.js"></script>
+		<script src="../fnAction/FunctionAction.js"></script>
+		<script src="../fnAction/md5-min.js"></script>
+		<link href="CSS_ext/Cssext1.css" rel="stylesheet" />
+		<script type="text/javascript">
+			$(document).ready(function() {
+				mui.init({
+					//下拉刷新、上拉加载
+					pullRefresh: {
+						//...
+					},
+					//手势配置
+					gestureConfig: {
+						//...
+					},
+					//侧滑关闭
+					swipeBack: false, //Boolean(默认false)启用右滑关闭功能
+
+					//监听Android手机的back、menu按键
+					keyEventBind: {
+						backbutton: true, //Boolean(默认true)关闭back按键监听
+						menubutton: false //Boolean(默认true)关闭menu按键监听
+					},
+					//处理窗口关闭前的业务
+					beforeback: function() {
+						//... //窗口关闭前处理其他业务详情点击 ↑ "关闭页面"链接查看
+					}
+				})
+				window.addEventListener("preAct", function() {
+					var extdata = event.detail.extdata;
+					var obj = new Object();
+					obj.ShipperCode = extdata;
+					$.ActionFn.sendData("GetMyMissionDetail", obj, StateSuccess);
+					}
+				)
+
+			function StateSuccess(msg) {
+				console.log(JSON.stringify(msg));
+				$.ActionFn.setPagesData(msg.Content, "carInfo");
+				$("#carinfo").val(JSON.stringify((msg.Content)));
+				$("#fachedanhao").text(msg.Content.RtnList[0].ShipperCode); //发车单号
+				$("#bancimingcheng").text(msg.Content.RtnList[0].RouteName); //班次名称
+				$("#fachezhongxin").text(msg.Content.RtnList[0].NodeName); //发车中心
+				$("#renwuleixing").text(msg.Content.RtnList[0].ShipperTypeStr);
+				$("#chepaihao").text(msg.Content.RtnList[0].VehicleNum); //车牌号
+				var details = msg.Content.RtnList;
+				var tr = "";
+				for(var i = 0; i < details.length; i++) {
+					//拼接状态条
+					//如果是第一条数据（首发站）
+					if(i == 0) {
+						//如果出发时间为空，进度条灰色
+						if(details[i + 1].SendDateTime == "") {
+							tr += '<tr><td style="background-image: url(../Images/Index/first1.png); background-repeat:no-repeat;text-align:center;border-bottom:0px; background-position:center;width:50px"></td> <td><span class="stationName">' + details[i].NodeName + '</span><br />发车时间:</td></tr>';
+						} else {
+							tr += '<tr><td style="background-image: url(../Images/Index/first.png); background-repeat:no-repeat;text-align:center;border-bottom:0px; background-position:center;width:50px"></td> <td><span class="stationName">' + details[i].NodeName + '</span><br />发车时间:' + details[i + 1].SendDateTime + '</td></tr>';
+						}
+					}
+					//如果是最后一条数据（终点站）
+					else if(i == details.length - 1) {
+						//如果到达站时间为空，上一站已经发车进度条半灰
+						if(details[i].ReachDateTime == "" && details[i].SendDateTime != "") {
+							tr += '<tr><td style="background-image: url(../Images/Index/last1.png); background-repeat:no-repeat;text-align:center;border-bottom:0px; background-position:center;width:50px"></td> <td><span class="stationName">' + details[i].NodeName + '</span><br />到达时间:<br /></td></tr>';
+						}
+						//如果到达站时间为空，上一站未发车进度条全灰
+						else if(details[i].ReachDateTime == "" && details[i].SendDateTime == "") {
+							tr += '<tr><td style="background-image: url(../Images/Index/last1.png); background-repeat:no-repeat;text-align:center;border-bottom:0px; background-position:center;width:50px"></td> <td><span class="stationName">' + details[i].NodeName + '</span><br />到达时间:<br /></td></tr>';
+						} else {
+							tr += '<tr><td style="background-image: url(../Images/Index/last.png); background-repeat:no-repeat;text-align:center;border-bottom:0px; background-position:center;width:50px"></td> <td><span class="stationName">' + details[i].NodeName + '</span><br />到达时间:' + details[i].ReachDateTime + '<br /></td></tr>';
+						}
+
+					}
+					//否则为中转站
+					else {
+						//如果出发时间为空，上一站已经发车，进度条半灰色
+						if(details[i + 1].SendDateTime == "" && details[i].SendDateTime != "") {
+							tr += '<tr><td style="background-image: url(../Images/Index/chenghui.png); background-repeat:no-repeat;text-align:center;border-bottom:0px; background-position:center;width:50px"></td> <td><span class="stationName">' + details[i].NodeName + '</span><br />到站时间:' + details[i + 1].ReachDateTime + '</br>发车时间:' + details[i].SendDateTime + '<br /></td></tr>';
+						}
+						//如果出发时间为空，上一站未发车，进度条全灰色
+						else if(details[i + 1].SendDateTime == "" && details[i].SendDateTime != "") {
+							tr += '<tr><td style="background-image: url(../Images/Index/center1.png); background-repeat:no-repeat;text-align:center;border-bottom:0px; background-position:center;width:50px"></td> <td><span class="stationName">' + details[i].NodeName + '</span><br />到站时间:' + details[i + 1].ReachDateTime + '</br>发车时间:' + details[i].SendDateTime + '<br /></td></tr>';
+						} else {
+							tr += '<tr><td style="background-image: url(../Images/Index/center.png); background-repeat:no-repeat;text-align:center;border-bottom:0px; background-position:center;width:50px"></td> <td><span class="stationName">' + details[i].NodeName + '</span><br />到站时间:' + details[i + 1].ReachDateTime + '</br>发车时间:' + details[i].SendDateTime + '<br /></td></tr>';
+						}
+
+					}
+					$("#luyou").append(tr);
+					tr = "";
+
+				}
+
+				var ShipperState = msg.Content.RtnList[0].ShipperState;
+				if(ShipperState == "0") {
+					$(".mui-title").text("未运输");
+				} else if(ShipperState == "1") {
+					$(".mui-title").text("运输中");
+				} else if(ShipperState == "2") {
+					$(".mui-title").text("已到达");
+				} else if(ShipperState == "3") {
+					$(".mui-title").text("返程中");
+				} else {
+					$(".mui-title").text("运输完成");
+				}
+
+			}
+
+			});
+			function toLocation() {
+				var data = $("#fachedanhao").text();
+				//$.ActionFn.selfFireFunction("AbnormalManage","preAct",data);
+				$.ActionFn.selfOpenWindow("AbnormalManage","AbnormalManage.html");
+			}
+		</script>
+		<style>
+			.title {
+				margin: 20px 15px 10px;
+				color: #03a2f5;
+				font-size: 15px;
+			}
+			
+			.img-after {
+				width: 20px;
+				height: 20px;
+				vertical-align: middle;
+				margin-left: 10px;
+			}
+			
+			.span-img-after {
+				padding: 11px 65px 11px 15px;
+			}
+			
+			#luyou tr {
+				height: 80px;
+				font-size: 1.2em;
+			}
+			
+			#luyou td {
+				border-bottom: solid 1px #C8C7CC;
+			}
+			
+			#luyou img {
+				height: 50px;
+			}
+			
+			.addressname {
+				margin-left: 35px;
+			}
+			
+			.wd {
+				position: relative;
+				top: -18px;
+			}
+			
+			* {
+				font-size: 13.7px
+			}
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title"></h1>
+		</header>
+		<div class="mui-content">
+
+			<div class="mui-card" style="margin-bottom: 35px;">
+				<div class="mui-card-header">班次名称：&nbsp;&nbsp;&nbsp;<span id="bancimingcheng"></span></div>
+				<div class="mui-card-header">发车中心：&nbsp;&nbsp;&nbsp;<span id="fachezhongxin"></span></div>
+				<div class="mui-card-header">发车单号：&nbsp;&nbsp;&nbsp;<span id="fachedanhao"></span></div>
+				<div class="mui-card-header">车&nbsp;牌&nbsp;号&nbsp;：&nbsp;&nbsp;&nbsp;<span id="chepaihao"></span></div>
+				<div class="mui-card-content" style="height:500px;">
+					<table style="width:100%" id="luyou" cellpadding="0" cellspacing="0">
+					</table>
+					<br />
+					<div style=" width:100%; text-align:center">
+						<input onclick="toLocation()" type="button" value="异常上报" class="mui-btn mui-btn-block btn-color" style="width: 130px; background-color: #03a2f5; color:white; margin:auto;" />
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</body>
+
+</html>

@@ -1,0 +1,417 @@
+﻿<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>Hello MUI</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<!--标准mui.css-->
+		<link rel="stylesheet" href="../css/mui.min.css">
+		<link rel="stylesheet" type="text/css" href="CSS_ext/Cssext1.css" />
+		<!--标准mui.js-->
+		<script type="text/javascript" src="js/jquery-2.1.4.min.js"></script>
+		<script type="text/javascript" src="../js/mui.min.js"></script>
+		<script type="text/javascript" src="../fnAction/FunctionAction.js"></script>
+		<script type="text/javascript" src="../fnAction/md5-min.js"></script>
+		<style>
+			
+			.MySalaryDetailView {
+				width: 100%;
+			}
+			
+			.MySalaryDetailView tr td {
+				width: 25%;
+			}
+			
+			.MySalaryDetailView tr td span {
+				font-size: 12px;
+			}
+			
+			.MySalaryDetailTabletd span {
+				color: #B7927E;
+			}
+		</style>
+		<script type="text/javascript">
+			function CallBackSuccess(returndata) {
+				if(returndata.Rtn_Code == '0') {
+					if(returndata.Content != null) {
+						//基础信息
+						//姓名
+						$('#MySalaryDetailName').text(returndata.Content.RtnMyWageList[0].DriName);
+						//工资月份
+						$('#MySalaryDetailMonth').text(returndata.Content.RtnMyWageList[0].SalaryMonth);
+						//入职日期
+						$('#MySalaryDetailInData').text(returndata.Content.RtnMyWageList[0].InData.substring(0, returndata.Content.RtnMyWageList[0].InData.indexOf(' ')));
+						//总公里数
+						$('#MySalaryDetailSumMiles').text(returndata.Content.RtnMyWageList[0].SumMiles);
+						//工资项	
+						//基本工资
+						$('#MySalaryDetailSalaryCost').text(returndata.Content.RtnMyWageList[0].SalaryCost);
+						//岗位工资
+						$('#MySalaryDetailPostCost').text(returndata.Content.RtnMyWageList[0].PostCost);
+						//绩效工资
+						$('#MySalaryDetailKPICost').text(returndata.Content.RtnMyWageList[0].KPICost);
+						//工龄工资
+						$('#MySalaryDetailAgeCost').text(returndata.Content.RtnMyWageList[0].AgeCost);
+						//补贴项
+						//餐补
+						$('#MySalaryDetailFoodCost').text(returndata.Content.RtnMyWageList[0].FoodCost);
+						//房贴
+						$('#MySalaryDetailHouseCost').text(returndata.Content.RtnMyWageList[0].HouseCost);
+						//时效奖
+						$('#MySalaryDetailTimeCost').text(returndata.Content.RtnMyWageList[0].TimeCost);
+						//安全奖
+						$('#MySalaryDetailSafeCost').text(returndata.Content.RtnMyWageList[0].SafeCost);
+						//全勤奖
+						$('#MySalaryDetailAllCost').text(returndata.Content.RtnMyWageList[0].AllCost);
+						//绩效补贴
+						$('#MySalaryDetailKPIUpCost').text(returndata.Content.RtnMyWageList[0].KPIUpCost);
+						//加班工资
+						$('#MySalaryDetailAddCost').text(returndata.Content.RtnMyWageList[0].AddCost);
+						//话费补贴
+						$('#MySalaryDetailTelCost').text(returndata.Content.RtnMyWageList[0].TelCost);
+						//其他补贴
+						$('#MySalaryDetailOtherCost').text(returndata.Content.RtnMyWageList[0].OtherCost);
+						//工伤工资
+						$('#MySalaryDetailVacationCost').text(returndata.Content.RtnMyWageList[0].VacationCost);
+						//考勤项
+						//考勤天数
+						$('#MySalaryDetailQqDay').text(returndata.Content.RtnMyWageList[0].QqDay);
+						//缺勤扣款
+						$('#MySalaryDetailQqCost').text(returndata.Content.RtnMyWageList[0].QqCost);
+						//签卡异常
+						$('#MySalaryDetailNote').text(returndata.Content.RtnMyWageList[0].Note);
+						//扣款项
+						//罚款
+						$('#MySalaryDetailDownCost').text(returndata.Content.RtnMyWageList[0].DownCost);
+						//房租
+						$('#MySalaryDetailHouseDownCost').text(returndata.Content.RtnMyWageList[0].HouseDownCost);
+						//水电扣款
+						$('#MySalaryDetailWaterCost').text(returndata.Content.RtnMyWageList[0].WaterCost);
+						//话费扣款
+						$('#MySalaryDetailTelDownCost').text(returndata.Content.RtnMyWageList[0].TelDownCost);
+						//质量扣款
+						$('#MySalaryDetailKPIDownCost').text(returndata.Content.RtnMyWageList[0].KPIDownCost);
+						//工服扣款
+						$('#MySalaryDetailClothingCost').text(returndata.Content.RtnMyWageList[0].ClothingCost);
+						//其他
+						$('#MySalaryDetailOtherDownCost').text(returndata.Content.RtnMyWageList[0].OtherDownCost);
+						//汇总
+						//个保小计
+						$('#MySalaryDetailSumSocialCost').text(returndata.Content.RtnMyWageList[0].SumSocialCost);
+						//个税
+						$('#MySalaryDetailGsCost').text(returndata.Content.RtnMyWageList[0].GsCost);
+						//应发工资
+						$('#MySalaryDetailYFCost').text(returndata.Content.RtnMyWageList[0].YFCost);
+						//入税工资
+						$('#MySalaryDetailRsCost').text(returndata.Content.RtnMyWageList[0].RsCost);
+						//实发工资
+						$('#MySalaryDetailSfCost').text(returndata.Content.RtnMyWageList[0].SfCost);
+					}
+				} else if(returndata.Rtn_Code == '1') {
+					mui.toast('当前没有工资详情')
+				} else if(returndata.Rtn_Code == '-1') {
+					mui.alert(returndata.Rtn_Msg, '警告', function() {})
+				}
+			}
+		</script>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav" >
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">工资详情</h1>
+		</header>
+		<div id="content" class="mui-content">
+			<div class="">
+				<ul class="mui-table-view">
+					<li class="mui-input-row" style="padding: 11px 15px 3px 8px;border-bottom: 1px solid #c8c7cc;">
+						<table class="MySalaryDetailViewHeader">
+							<tr>
+								<td style="color: #03A2F5;">基础信息</td>
+							</tr>
+						</table>
+					</li>
+					<li class="mui-input-row" style="padding: 11px 15px 3px 8px;border-bottom: 1px solid #c8c7cc;">
+						<table class="MySalaryDetailView">
+							<tr>
+								<td><span class="mui-h5">姓名：</span></td>
+								<td class="MySalaryDetailTabletd"><span id='MySalaryDetailName' class="mui-h5"></span></td>
+								<td><span class="mui-h5">工资月份：</span></td>
+								<td class="MySalaryDetailTabletd"><span id='MySalaryDetailMonth' class="mui-h5"></span></td>
+							</tr>
+						</table>
+					</li>
+					<li class="mui-input-row" style="padding: 11px 15px 3px 8px">
+						<table class="MySalaryDetailView">
+							<tr>
+								<td><span class="mui-h5">入职日期：</span></td>
+								<td class="MySalaryDetailTabletd"><span id='MySalaryDetailInData' class="mui-h5"></span></td>
+								<td><span class="mui-h5">总公里数：</span></td>
+								<td class="MySalaryDetailTabletd"><span id='MySalaryDetailSumMiles' class="mui-h5"></span></td>
+							</tr>
+						</table>
+					</li>
+				</ul>
+			</div>
+			<div class="" style="padding-top:10px">
+				<ul class="mui-table-view">
+					<li class="mui-input-row" style="padding: 11px 15px 3px 8px;border-bottom: 1px solid #c8c7cc;">
+						<table class="MySalaryDetailViewHeader">
+							<tr>
+								<td style="color: #03A2F5;">工资项</td>
+							</tr>
+						</table>
+					</li>
+					<li class="mui-input-row" style="padding: 11px 15px 3px 8px;border-bottom: 1px solid #c8c7cc;">
+						<table class="MySalaryDetailView">
+							<tr>
+								<td><span class="mui-h5">基本工资：</span></td>
+								<td class="MySalaryDetailTabletd"><span id='MySalaryDetailSalaryCost' class="mui-h5"></span></td>
+								<td><span class="mui-h5">岗位工资：</span></td>
+								<td class="MySalaryDetailTabletd"><span id='MySalaryDetailPostCost' class="mui-h5"></span></td>
+							</tr>
+						</table>
+					</li>
+					<li class="mui-input-row" style="padding: 11px 15px 3px 8px;">
+						<table class="MySalaryDetailView">
+							<tr>
+								<td><span class="mui-h5">绩效工资：</span></td>
+								<td class="MySalaryDetailTabletd"><span id='MySalaryDetailKPICost' class="mui-h5"></span></td>
+								<td><span class="mui-h5">工龄工资：</span></td>
+								<td class="MySalaryDetailTabletd"><span id='MySalaryDetailAgeCost' class="mui-h5"></span></td>
+							</tr>
+						</table>
+					</li>
+				</ul>
+			</div>
+			<div class="" style="padding-top:10px">
+				<ul class="mui-table-view">
+					<li class="mui-input-row" style="padding: 11px 15px 3px 8px;border-bottom: 1px solid #c8c7cc;">
+						<table class="MySalaryDetailViewHeader">
+							<tr>
+								<td style="color: #03A2F5;">补贴项</td>
+							</tr>
+						</table>
+					</li>
+					<li class="mui-input-row" style="padding: 11px 15px 3px 8px;border-bottom: 1px solid #c8c7cc;">
+						<table class="MySalaryDetailView">
+							<tr>
+								<td><span class="mui-h5">餐补：</span></td>
+								<td class="MySalaryDetailTabletd"><span id='MySalaryDetailFoodCost' class="mui-h5"></span></td>
+								<td><span class="mui-h5">房帖：</span></td>
+								<td class="MySalaryDetailTabletd"><span id='MySalaryDetailHouseCost' class="mui-h5"></span></td>
+							</tr>
+						</table>
+					</li>
+					<li class="mui-input-row" style="padding: 11px 15px 3px 8px;border-bottom: 1px solid #c8c7cc;">
+						<table class="MySalaryDetailView">
+							<tr>
+								<td><span class="mui-h5">时效奖：</span></td>
+								<td class="MySalaryDetailTabletd"><span id='MySalaryDetailTimeCost' class="mui-h5"></span></td>
+								<td><span class="mui-h5">安全奖：</span></td>
+								<td class="MySalaryDetailTabletd"><span id='MySalaryDetailSafeCost' class="mui-h5"></span></td>
+							</tr>
+						</table>
+					</li>
+					<li class="mui-input-row" style="padding: 11px 15px 3px 8px;border-bottom: 1px solid #c8c7cc;">
+						<table class="MySalaryDetailView">
+							<tr>
+								<td><span class="mui-h5">全勤奖：</span></td>
+								<td class="MySalaryDetailTabletd"><span id='MySalaryDetailAllCost' class="mui-h5"></span></td>
+								<td><span class="mui-h5">绩效补贴：</span></td>
+								<td class="MySalaryDetailTabletd"><span id='MySalaryDetailKPIUpCost' class="mui-h5"></span></td>
+							</tr>
+						</table>
+					</li>
+					<li class="mui-input-row" style="padding: 11px 15px 3px 8px;border-bottom: 1px solid #c8c7cc;">
+						<table class="MySalaryDetailView">
+							<tr>
+								<td><span class="mui-h5">加班工资：</span></td>
+								<td class="MySalaryDetailTabletd"><span id='MySalaryDetailAddCost' class="mui-h5"></span></td>
+								<td><span class="mui-h5">话费补贴：</span></td>
+								<td class="MySalaryDetailTabletd"><span id='MySalaryDetailTelCost' class="mui-h5"></span></td>
+							</tr>
+						</table>
+					</li>
+					<li class="mui-input-row" style="padding: 11px 15px 3px 8px;">
+						<table class="MySalaryDetailView">
+							<tr>
+								<td><span class="mui-h5">其他补贴：</span></td>
+								<td class="MySalaryDetailTabletd"><span id='MySalaryDetailOtherCost' class="mui-h5"></span></td>
+								<td><span class="mui-h5">工伤工资：</span></td>
+								<td class="MySalaryDetailTabletd"><span id='MySalaryDetailVacationCost' class="mui-h5"></span></td>
+							</tr>
+						</table>
+					</li>
+				</ul>
+			</div>
+			<div class="" style="padding-top:10px">
+				<ul class="mui-table-view">
+					<li class="mui-input-row" style="padding: 11px 15px 3px 8px;border-bottom: 1px solid #c8c7cc;">
+						<table class="MySalaryDetailViewHeader">
+							<tr>
+								<td style="color: #03A2F5;">考勤项</td>
+							</tr>
+						</table>
+					</li>
+					<li class="mui-input-row" style="padding: 11px 15px 3px 8px;border-bottom: 1px solid #c8c7cc;">
+						<table class="MySalaryDetailView">
+							<tr>
+								<td><span class="mui-h5">考勤天数：</span></td>
+								<td class="MySalaryDetailTabletd"><span id='MySalaryDetailQqDay' class="mui-h5"></span></td>
+								<td><span class="mui-h5">缺勤扣款：</span></td>
+								<td class="MySalaryDetailTabletd"><span id='MySalaryDetailQqCost' class="mui-h5"></span></td>
+							</tr>
+						</table>
+					</li>
+					<li class="mui-input-row" style="padding: 11px 15px 3px 8px;">
+						<table class="MySalaryDetailView">
+							<tr>
+								<td><span class="mui-h5">签卡异常：</span></td>
+								<td class="MySalaryDetailTabletd"><span id='MySalaryDetailNote' class="mui-h5"></span></td>
+								<td><span class="mui-h5"></span></td>
+								<td class="MySalaryDetailTabletd"><span class="mui-h5"></span></td>
+							</tr>
+						</table>
+					</li>
+				</ul>
+			</div>
+			<div class="" style="padding-top:10px">
+				<ul class="mui-table-view">
+					<li class="mui-input-row" style="padding: 11px 15px 3px 8px;border-bottom: 1px solid #c8c7cc;">
+						<table class="MySalaryDetailViewHeader">
+							<tr>
+								<td style="color: #03A2F5;">扣款项</td>
+							</tr>
+						</table>
+					</li>
+					<li class="mui-input-row" style="padding: 11px 15px 3px 8px;border-bottom: 1px solid #c8c7cc;">
+						<table class="MySalaryDetailView">
+							<tr>
+								<td><span class="mui-h5">罚款：</span></td>
+								<td class="MySalaryDetailTabletd"><span id='MySalaryDetailDownCost' class="mui-h5"></span></td>
+								<td><span class="mui-h5">房租：</span></td>
+								<td class="MySalaryDetailTabletd"><span id='MySalaryDetailHouseDownCost' class="mui-h5"></span></td>
+							</tr>
+						</table>
+					</li>
+					<li class="mui-input-row" style="padding: 11px 15px 3px 8px;border-bottom: 1px solid #c8c7cc;">
+						<table class="MySalaryDetailView">
+							<tr>
+								<td><span class="mui-h5">水电扣款：</span></td>
+								<td class="MySalaryDetailTabletd"><span id='MySalaryDetailWaterCost' class="mui-h5"></span></td>
+								<td><span class="mui-h5">话费扣款：</span></td>
+								<td class="MySalaryDetailTabletd"><span id='MySalaryDetailTelDownCost' class="mui-h5"></span></td>
+							</tr>
+						</table>
+					</li>
+					<li class="mui-input-row" style="padding: 11px 15px 3px 8px;border-bottom: 1px solid #c8c7cc;">
+						<table class="MySalaryDetailView">
+							<tr>
+								<td><span class="mui-h5">质量扣款：</span></td>
+								<td class="MySalaryDetailTabletd"><span id='MySalaryDetailKPIDownCost' class="mui-h5"></span></td>
+								<td><span class="mui-h5">工服扣款：</span></td>
+								<td class="MySalaryDetailTabletd"><span id='MySalaryDetailClothingCost' class="mui-h5"></span></td>
+							</tr>
+						</table>
+					</li>
+					<li class="mui-input-row" style="padding: 11px 15px 3px 8px;">
+						<table class="MySalaryDetailView">
+							<tr>
+								<td><span class="mui-h5">其他：</span></td>
+								<td class="MySalaryDetailTabletd"><span id='MySalaryDetailOtherDownCost' class="mui-h5"></span></td>
+								<td><span class="mui-h5"></span></td>
+								<td class="MySalaryDetailTabletd"><span class="mui-h5"></span></td>
+							</tr>
+						</table>
+					</li>
+				</ul>
+			</div>
+			<div class="" style="padding-top:10px">
+			<ul class="mui-table-view">
+				<li class="mui-input-row" style="padding: 11px 15px 3px 8px;border-bottom: 1px solid #c8c7cc;">
+					<table class="MySalaryDetailViewHeader">
+						<tr>
+							<td style="color: #03A2F5;">汇总</td>
+						</tr>
+					</table>
+				</li>
+				<li class="mui-input-row" style="padding: 11px 15px 3px 8px;border-bottom: 1px solid #c8c7cc;">
+					<table class="MySalaryDetailView">
+						<tr>
+							<td><span class="mui-h5">个保小计：</span></td>
+							<td class="MySalaryDetailTabletd"><span id='MySalaryDetailSumSocialCost' class="mui-h5"></span></td>
+							<td><span class="mui-h5">个税：</span></td>
+							<td class="MySalaryDetailTabletd"><span id='MySalaryDetailGsCost' class="mui-h5"></span></td>
+						</tr>
+					</table>
+				</li>
+				<li class="mui-input-row" style="padding: 11px 15px 3px 8px;border-bottom: 1px solid #c8c7cc;">
+					<table class="MySalaryDetailView">
+						<tr>
+							<td><span class="mui-h5">应发金额：</span></td>
+							<td class="MySalaryDetailTabletd"><span id='MySalaryDetailYFCost' class="mui-h5"></span></td>
+							<td><span class="mui-h5">入税工资：</span></td>
+							<td class="MySalaryDetailTabletd"><span id='MySalaryDetailRsCost' class="mui-h5"></span></td>
+						</tr>
+					</table>
+				</li>
+				<li class="mui-input-row" style="padding: 11px 15px 3px 8px;border-bottom: 1px solid #c8c7cc;">
+					<table class="MySalaryDetailView">
+						<tr>
+							<td><span class="mui-h5">实发工资：</span></td>
+							<td class="MySalaryDetailTabletd"><span id='MySalaryDetailSfCost' class="mui-h5"></span></td>
+							<td><span class="mui-h5"></span></td>
+							<td class="MySalaryDetailTabletd"><span class="mui-h5"></span></td>
+						</tr>
+					</table>
+				</li>
+			</ul>
+		</div>
+		</div>
+		<script>
+		mui.plusReady(function() {
+				plus.webview.currentWebview().setStyle({
+					scrollIndicator: 'none'
+				});
+			});
+			mui.init({
+				//下拉刷新、上拉加载
+				pullRefresh: {
+					//...
+				},
+				//手势配置
+				gestureConfig: {
+					//...
+				},
+				//侧滑关闭
+				swipeBack: true, //Boolean(默认false)启用右滑关闭功能
+				//监听Android手机的back、menu按键
+				keyEventBind: {
+					backbutton: true, //Boolean(默认true)关闭back按键监听
+					menubutton: false //Boolean(默认true)关闭menu按键监听
+				},
+				//处理窗口关闭前的业务
+				beforeback: function() {
+					//... //窗口关闭前处理其他业务详情点击 ↑ "关闭页面"链接查看
+					$.ActionFn.selfFireFunction("MySalaryTable","preAct","");
+				},
+				
+			});
+			mui.plusReady(function() {});
+			window.addEventListener("preAct",function() {
+				var extdata = event.detail.extdata;
+				var userInfo = $.ActionFn.GetlocalStorage("userInfo");
+				var MySalaryDetailobject = new Object();
+				MySalaryDetailobject.HRCode = userInfo.RtnLoginList[0].HRCode;
+				MySalaryDetailobject.SalaryMonth = extdata
+				$.ActionFn.removePagesData('MySalaryMonth');
+				$.ActionFn.sendData("GetMyWageDetail", MySalaryDetailobject, CallBackSuccess)
+			})
+		</script>
+	</body>
+
+</html>
